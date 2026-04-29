@@ -33,5 +33,3 @@ src/
 ├── types/          # Tipos TypeScript
 └── utils/          # Funcoes auxiliares
 ## Equipe
-
-- (Adicionar nomes dos integrantes)
