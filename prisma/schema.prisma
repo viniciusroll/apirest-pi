@@ -1,0 +1,41 @@
+// ============================================================================
+// Schema Prisma — fonte unica de verdade da estrutura do banco
+// ============================================================================
+// Este arquivo descreve as tabelas, colunas e relacionamentos do banco.
+// Quando rodamos 'npx prisma migrate dev', o Prisma le este arquivo e:
+//   1. Gera/atualiza o banco SQLite (cria as tabelas SQL automaticamente)
+//   2. Gera o cliente @prisma/client com tipos TypeScript prontos
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// generator: o que o Prisma deve PRODUZIR a partir deste schema
+// ----------------------------------------------------------------------------
+// 'prisma-client-js' gera as classes TypeScript dentro de
+// node_modules/@prisma/client. Depois de rodar a migration, conseguimos
+// importar e usar com autocomplete:
+//
+//   import { PrismaClient } from "@prisma/client";
+//   const prisma = new PrismaClient();
+//   await prisma.user.findMany();  // <- tipado!
+// ----------------------------------------------------------------------------
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ----------------------------------------------------------------------------
+// datasource: ONDE o banco fica e QUE SGBD e' usado
+// ----------------------------------------------------------------------------
+// provider = "sqlite"
+//   Usamos SQLite por simplicidade — o banco vira um arquivo .db unico,
+//   nao precisa instalar servidor. Em producao trocariamos para
+//   "postgresql" e a URL apontaria para um servidor real.
+//
+// url = env("DATABASE_URL")
+//   Nao colocamos a URL fixa aqui. O Prisma le do arquivo .env
+//   (variavel DATABASE_URL). Isso permite trocar o caminho do banco
+//   sem alterar codigo (ex.: dev usa um arquivo, testes usam outro).
+// ----------------------------------------------------------------------------
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
