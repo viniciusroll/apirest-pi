@@ -136,3 +136,35 @@ CREATE TABLE IF NOT EXISTS categoria_produto (
   UNIQUE (id_produto, categoria),
   FOREIGN KEY (id_produto) REFERENCES produto(id_produto) ON DELETE CASCADE
 );
+
+-- =====================================================
+-- Tabela: pedido
+-- Vendas realizadas (RF03).
+-- Vinculada a UM cliente (RN03).
+-- total_pedido sera calculado pelo service (RN02).
+-- pago = 0 quando forma_pagamento = 'FIADO' (RF10/RN06 — cliente em debito).
+-- status permite cancelar pedidos (RF12).
+-- =====================================================
+CREATE TABLE IF NOT EXISTS pedido (
+  id_pedido         INTEGER  PRIMARY KEY AUTOINCREMENT,
+  id_cliente        INTEGER  NOT NULL,
+  forma_pagamento   TEXT     NOT NULL CHECK (forma_pagamento IN ('DINHEIRO','CARTAO','PIX','FIADO')),
+  status            TEXT     NOT NULL DEFAULT 'PAGO' CHECK (status IN ('PENDENTE','PAGO','CANCELADO')),
+  total_pedido      REAL     NOT NULL DEFAULT 0 CHECK (total_pedido >= 0),
+  pago              INTEGER  NOT NULL DEFAULT 1 CHECK (pago IN (0,1)),
+  criado_em         DATETIME DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em     DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+);
+
+-- Trigger para atualizar 'atualizado_em' em qualquer UPDATE
+CREATE TRIGGER IF NOT EXISTS pedido_atualizado_em
+AFTER UPDATE ON pedido
+FOR EACH ROW
+BEGIN
+  UPDATE pedido SET atualizado_em = CURRENT_TIMESTAMP WHERE id_pedido = OLD.id_pedido;
+END;
+
+CREATE INDEX IF NOT EXISTS idx_pedido_cliente   ON pedido(id_cliente);
+CREATE INDEX IF NOT EXISTS idx_pedido_status    ON pedido(status);
+CREATE INDEX IF NOT EXISTS idx_pedido_pago      ON pedido(pago);
