@@ -1,3 +1,15 @@
+-- ============================================================================
+-- schema.sql — estrutura do banco de dados (SQL puro)
+-- ============================================================================
+-- As tabelas serao adicionadas nos proximos commits, uma por uma:
+--   1. clients      — clientes da loja
+--   2. users        — fornecedores da loja
+--   3. users        — funcionarios do sistema (RF13, RNF04)
+--   4. products     — produtos a venda
+--   5. orders       — pedidos (vendas)
+--   6. order_items  — itens dentro de cada pedido
+-- ============================================================================
+
 -- =====================================================
 -- Tabela: cliente
 -- Representa a entidade "cliente" do DER.
