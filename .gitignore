@@ -26,3 +26,6 @@ npm-debug.log*
 # Sistema operacional
 .DS_Store
 Thumbs.db
+
+# Banco de dados
+*.db

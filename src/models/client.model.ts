@@ -1,8 +1,24 @@
-export interface Client {
-    client_id: number;
-    name: string;
-    cpf: number;
-    email: string;
-    phone_number: string;
-    created_at: string
+export interface Cliente {
+  id_cliente: number;
+  nome: string;
+  cpf: string;
+  endereco: string | null;
+  criado_em: string;
+}
+
+export interface EmailCliente {
+  id: number;
+  id_cliente: number;
+  email: string;
+}
+
+export interface TelefoneCliente {
+  id: number;
+  id_cliente: number;
+  telefone: string;
+}
+
+export interface ClienteCompleto extends Cliente {
+  emails: string[];
+  telefones: string[];
 }
