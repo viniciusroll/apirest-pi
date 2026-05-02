@@ -8,7 +8,6 @@ API REST desenvolvida em TypeScript + Node.js + Express para gerenciamento de pe
 - Node.js
 - Express
 - Zod (validacoes)
-- Prisma (ORM)
 - SQLite (banco de dados)
 - JWT (autenticacao)
 
