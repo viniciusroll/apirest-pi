@@ -76,3 +76,29 @@ CREATE TABLE IF NOT EXISTS telefone_fornecedor (
 
 CREATE INDEX IF NOT EXISTS idx_email_fornecedor    ON email_fornecedor(id_fornecedor);
 CREATE INDEX IF NOT EXISTS idx_telefone_fornecedor ON telefone_fornecedor(id_fornecedor);
+
+-- =====================================================
+-- Tabela: usuario (RF13, RNF04)
+-- Funcionarios que fazem LOGIN no sistema.
+-- NAO confundir com cliente (cliente da loja, nao loga).
+-- =====================================================
+CREATE TABLE IF NOT EXISTS usuario (
+  id_usuario     INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome           TEXT NOT NULL,
+  email          TEXT NOT NULL UNIQUE,
+  senha_hash     TEXT NOT NULL,
+  papel          TEXT NOT NULL DEFAULT 'FUNCIONARIO',
+  criado_em      DATETIME DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em  DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Trigger para atualizar 'atualizado_em' em qualquer UPDATE
+-- (SQLite nao tem 'ON UPDATE CURRENT_TIMESTAMP' como o MySQL)
+CREATE TRIGGER IF NOT EXISTS usuario_atualizado_em
+AFTER UPDATE ON usuario
+FOR EACH ROW
+BEGIN
+  UPDATE usuario SET atualizado_em = CURRENT_TIMESTAMP WHERE id_usuario = OLD.id_usuario;
+END;
+
+CREATE INDEX IF NOT EXISTS idx_usuario_email ON usuario(email);
