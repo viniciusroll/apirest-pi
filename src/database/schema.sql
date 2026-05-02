@@ -168,3 +168,25 @@ END;
 CREATE INDEX IF NOT EXISTS idx_pedido_cliente   ON pedido(id_cliente);
 CREATE INDEX IF NOT EXISTS idx_pedido_status    ON pedido(status);
 CREATE INDEX IF NOT EXISTS idx_pedido_pago      ON pedido(pago);
+
+-- =====================================================
+-- Tabela: item_pedido
+-- Itens dentro de cada pedido (relaciona pedido <-> produto).
+-- Resolve o N:N entre pedido e produto.
+-- preco_unitario e CONGELADO no momento da venda — se o preco do
+-- produto mudar amanha, o pedido de hoje preserva o valor cobrado.
+-- subtotal = quantidade * preco_unitario (calculado pelo service).
+-- =====================================================
+CREATE TABLE IF NOT EXISTS item_pedido (
+  id_item          INTEGER PRIMARY KEY AUTOINCREMENT,
+  id_pedido        INTEGER NOT NULL,
+  id_produto       INTEGER NOT NULL,
+  quantidade       INTEGER NOT NULL CHECK (quantidade > 0),
+  preco_unitario   REAL    NOT NULL CHECK (preco_unitario > 0),
+  subtotal         REAL    NOT NULL CHECK (subtotal > 0),
+  FOREIGN KEY (id_pedido)  REFERENCES pedido(id_pedido) ON DELETE CASCADE,
+  FOREIGN KEY (id_produto) REFERENCES produto(id_produto)
+);
+
+CREATE INDEX IF NOT EXISTS idx_item_pedido_pedido    ON item_pedido(id_pedido);
+CREATE INDEX IF NOT EXISTS idx_item_pedido_produto   ON item_pedido(id_produto);
