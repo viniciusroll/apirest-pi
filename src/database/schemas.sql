@@ -30,3 +30,37 @@ CREATE TABLE IF NOT EXISTS telefone_cliente (
 
 CREATE INDEX IF NOT EXISTS idx_email_cliente    ON email_cliente(id_cliente);
 CREATE INDEX IF NOT EXISTS idx_telefone_cliente ON telefone_cliente(id_cliente);
+
+-- =====================================================
+-- Tabela: fornecedor
+-- Representa a entidade "fornecedor" do DER.
+-- Atributos multivalorados (email, telefone) ficam em
+-- tabelas separadas: email_fornecedor e telefone_fornecedor.
+-- =====================================================
+CREATE TABLE IF NOT EXISTS fornecedor (
+  id_fornecedor   INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome            TEXT NOT NULL,
+  cnpj            TEXT NOT NULL UNIQUE,
+  endereco        TEXT,
+  lead_time       INTEGER CHECK (lead_time IS NULL OR lead_time >= 0),
+  criado_em       DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS email_fornecedor (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  id_fornecedor   INTEGER NOT NULL,
+  email           TEXT NOT NULL,
+  UNIQUE (id_fornecedor, email),
+  FOREIGN KEY (id_fornecedor) REFERENCES fornecedor(id_fornecedor) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS telefone_fornecedor (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  id_fornecedor   INTEGER NOT NULL,
+  telefone        TEXT NOT NULL,
+  UNIQUE (id_fornecedor, telefone),
+  FOREIGN KEY (id_fornecedor) REFERENCES fornecedor(id_fornecedor) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_email_fornecedor    ON email_fornecedor(id_fornecedor);
+CREATE INDEX IF NOT EXISTS idx_telefone_fornecedor ON telefone_fornecedor(id_fornecedor);
