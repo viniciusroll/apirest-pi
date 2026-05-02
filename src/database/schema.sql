@@ -1,0 +1,10 @@
+-- ============================================================================
+-- schema.sql — estrutura do banco de dados (SQL puro)
+-- ============================================================================
+-- As tabelas serao adicionadas nos proximos commits, uma por uma:
+--   1. users        — funcionarios do sistema (RF13, RNF04)
+--   2. clients      — clientes da loja
+--   3. products     — produtos a venda
+--   4. orders       — pedidos (vendas)
+--   5. order_items  — itens dentro de cada pedido
+-- ============================================================================
