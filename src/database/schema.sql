@@ -102,3 +102,37 @@ BEGIN
 END;
 
 CREATE INDEX IF NOT EXISTS idx_usuario_email ON usuario(email);
+
+-- =====================================================
+-- Tabela: produto
+-- Produtos disponiveis para venda (PDF secao 4).
+-- Atributo multivalorado: categoria (um produto pode ter varias).
+-- =====================================================
+CREATE TABLE IF NOT EXISTS produto (
+  id_produto         INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome               TEXT    NOT NULL,
+  preco              REAL    NOT NULL CHECK (preco > 0),
+  estoque            INTEGER NOT NULL DEFAULT 0 CHECK (estoque >= 0),
+  validade           DATE,
+  id_fornecedor      INTEGER,
+  criado_em          DATETIME DEFAULT CURRENT_TIMESTAMP,
+  atualizado_em      DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_fornecedor) REFERENCES fornecedor(id_fornecedor) ON DELETE SET NULL
+);
+
+-- Trigger para atualizar 'atualizado_em' em qualquer UPDATE
+CREATE TRIGGER IF NOT EXISTS produto_atualizado_em
+AFTER UPDATE ON produto
+FOR EACH ROW
+BEGIN
+  UPDATE produto SET atualizado_em = CURRENT_TIMESTAMP WHERE id_produto = OLD.id_produto;
+END;
+
+-- Multivalorado: categorias do produto
+CREATE TABLE IF NOT EXISTS categoria_produto (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  id_produto    INTEGER NOT NULL,
+  categoria     TEXT NOT NULL,
+  UNIQUE (id_produto, categoria),
+  FOREIGN KEY (id_produto) REFERENCES produto(id_produto) ON DELETE CASCADE
+);
