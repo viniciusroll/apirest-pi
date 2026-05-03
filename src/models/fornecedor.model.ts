@@ -23,3 +23,6 @@ export interface FornecedorCompleto extends Fornecedor {
   emails: string[];
   telefones: string[];
 }
+
+export type EntradaCriarFornecedor = Omit<Fornecedor, "id_fornecedor" | "criado_em">;
+export type EntradaAtualizarFornecedor = Partial<EntradaCriarFornecedor>;

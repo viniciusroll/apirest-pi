@@ -22,3 +22,6 @@ export interface ClienteCompleto extends Cliente {
   emails: string[];
   telefones: string[];
 }
+
+export type EntradaCriarCliente = Omit<Cliente, "id_cliente" | "criado_em">;
+export type EntradaAtualizarCliente = Partial<EntradaCriarCliente>;
