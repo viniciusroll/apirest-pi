@@ -26,7 +26,7 @@ Atualmente, o controle de vendas é feito manualmente em cadernos, o que ocasion
 - Ausência de relatórios para apoiar decisões de compra e reposição de estoque  
 - Falta de histórico consolidado de clientes e produtos  
 
-## 3. Objetivo
+## 4. Objetivo
 O sistema tem como proposta:
 
 - Automatizar o processo de registro de pedidos e vendas  
@@ -35,14 +35,12 @@ O sistema tem como proposta:
 - Melhorar a eficiência operacional e o atendimento ao cliente  
 - Fornecer relatórios gerenciais para apoiar a tomada de decisão  
 - Garantir segurança e integridade dos dados
-  
-4. Definição de Requisitos do Usuário 
 
-Necessita-se de um sistema de controle comercial, onde constam clientes, produtos e pedidos. 
+## 5. Definição de Requisitos do Usuário 
 
- 
+Necessita-se de um sistema de controle comercial, onde constam clientes, produtos, fornecedores e pedidos. 
 
-4.1 Necessidades do usuário 
+### 5.1 Necessidades do usuário 
 
 O sistema deverá atender às necessidades operacionais de uma loja de bebidas, permitindo o controle eficiente das vendas e do relacionamento com clientes. Para isso, o sistema deverá possibilitar: 
 
@@ -62,7 +60,7 @@ O sistema deverá atender às necessidades operacionais de uma loja de bebidas, 
 
    Registro da forma de pagamento (dinheiro, cartão, pix, etc.); 
 
-4.2 Problemas atuais 
+### 5.2 Problemas atuais 
 
 Atualmente, o controle de vendas e pedidos é realizado de forma manual, utilizando cadernos ou anotações informais. Esse método apresenta diversas limitações, tais como: 
 
@@ -80,7 +78,7 @@ Atualmente, o controle de vendas e pedidos é realizado de forma manual, utiliza
 
 Esses problemas impactam diretamente a eficiência do negócio e a qualidade do atendimento ao cliente. 
 
-4.3 Objetivos do sistema 
+### 5.3 Objetivos do sistema 
 
 O sistema tem como principal objetivo automatizar o processo de gerenciamento de pedidos em uma loja de bebidas, proporcionando maior controle, organização e confiabilidade das informações. Entre os principais objetivos, destacam-se: 
 
@@ -98,8 +96,9 @@ O sistema tem como principal objetivo automatizar o processo de gerenciamento de
 
   Garantir maior segurança e integridade das informações; 
 
-Dessa forma, o sistema contribuirá para tornar o processo de vendas mais eficiente, moderno e confiável. 
-## 4. Escopo
+Dessa forma, o sistema contribuirá para tornar o processo de vendas mais eficiente, moderno e confiável.
+
+## 6. Escopo
 
 ### Cadastro de Clientes
 - Nome completo  
@@ -133,11 +132,11 @@ Dessa forma, o sistema contribuirá para tornar o processo de vendas mais eficie
 - Comparativo de vendas por categoria de produto  
 - Histórico de compras por cliente  
 
-## 5. Especificação de Requisitos
+## 7. Especificação de Requisitos
 
 Especificação de requisitos do sistema 
 
-## 5.1 Requisitos Funcionais 
+### 7.1 Requisitos Funcionais 
 
    RF01 – O sistema deve permitir o cadastro de clientes; 
 
@@ -165,7 +164,7 @@ Especificação de requisitos do sistema
 
    RF13 – O sistema deve permitir o login de usuários autorizados;  
 
-## 5.2 Regras de Negócio 
+### 7.2 Regras de Negócio 
 
    RN01 – O sistema não deve permitir a venda de produtos sem estoque disponível; 
 
@@ -181,40 +180,38 @@ Especificação de requisitos do sistema
 
    RN07 – O sistema deve registrar a forma de pagamento de cada pedido;  
 
-## 4.3 Requisitos Não Funcionais 
+### 7.3 Requisitos Não Funcionais 
 
-    RNF01 – O sistema deve responder às ações do usuário em até 5 segundos;  
+   RNF01 – O sistema deve responder às ações do usuário em até 5 segundos;  
 
-## Usabilidade 
+#### Usabilidade 
 
    RNF02 – O sistema deve possuir interface simples e intuitiva; 
 
   RNF03 – O usuário deve ser capaz de utilizar o sistema após treinamento básico;  
 
-## Segurança 
-
-   RNF04 – O sistema deve exigir login e senha para acesso; 
+#### Segurança
 
    RNF05 – O sistema deve garantir que apenas usuários autorizados tenham acesso às informações;  
 
-## Confiabilidade 
+#### Confiabilidade 
 
   RNF06 – O sistema deve garantir a integridade dos dados armazenados; 
 
    RNF07 – O sistema deve permitir recuperação de dados em caso de falhas;  
 
-## Disponibilidade 
+#### Disponibilidade 
 
    RNF08 – O sistema deve estar disponível durante o horário de funcionamento da loja; 
-    
-## 6. Arquitetura Proposta
+
+## 8. Arquitetura Proposta
 - **Frontend**: Interface web responsiva, acessível em computadores e dispositivos móveis  
 - **Backend**: API REST desenvolvida em linguagem moderna (ex.: Java, Python ou Node.js)  
 - **Banco de Dados**: Relacional (ex.: MySQL ou PostgreSQL) para garantir integridade e consistência  
 - **Segurança**: Autenticação JWT, criptografia de senhas e controle de acesso por perfil  
 - **Infraestrutura**: Hospedagem em servidor local ou nuvem (AWS, Azure, GCP)  
 
-## 7. Benefícios Esperados
+## 9. Benefícios Esperados
 - Redução de erros em pedidos e cálculos financeiros  
 - Maior controle sobre clientes inadimplentes  
 - Organização eficiente do estoque e reposição preventiva  
@@ -223,9 +220,9 @@ Especificação de requisitos do sistema
 - Segurança e confiabilidade dos dados  
 - Escalabilidade para crescimento da loja
 
-## 8. Modelagem de Dados (DER) 
+## 10. Modelagem de Dados (DER) 
 
- 
+ ![Diagrama Entidade-Relacionamento do sistema](../diagramas/der.png)
 
 A modelagem de dados do sistema foi desenvolvida com o objetivo de representar de forma estruturada as informações necessárias para o funcionamento do sistema de pedidos da loja de bebidas. 
 
@@ -233,75 +230,77 @@ O modelo Entidade-Relacionamento (DER) define as principais entidades do sistema
 
 As principais entidades identificadas foram: 
 
-Cliente: responsável por armazenar os dados dos clientes cadastrados no sistema. 
-
-Produto: responsável por armazenar as informações dos produtos disponíveis para venda. 
-
-Pedido: representa as vendas realizadas, associando clientes aos produtos adquiridos. 
-
-ItemPedido: entidade responsável por detalhar os produtos contidos em cada pedido, permitindo registrar múltiplos produtos em um único pedido. 
+- **Cliente**: armazena os dados dos clientes cadastrados no sistema. 
+- **Fornecedor**: armazena os dados dos fornecedores que abastecem os produtos. 
+- **Produto**: armazena as informações dos produtos disponíveis para venda, vinculados a um fornecedor. 
+- **Pedido**: representa as vendas realizadas, associando clientes aos produtos adquiridos. 
+- **ItemPedido**: detalha os produtos contidos em cada pedido (entidade fraca que resolve o N:N entre `Pedido` e `Produto`). 
+- **Usuário**: representa os funcionários autorizados a operar o sistema (atende ao RF13 e RNF04). 
 
 A seguir, são descritas as entidades e seus principais atributos: 
 
-## Cliente: 
+### Cliente 
 
-   id_cliente (chave primária) 
+- `id_cliente` (chave primária) 
+- `nome` 
+- `cpf` (único) 
+- `endereço` 
+- `email` (multivalorado) 
+- `telefone` (multivalorado) 
 
-  nome 
+### Fornecedor 
 
-  CPF 
+- `id_fornecedor` (chave primária) 
+- `nome` 
+- `cnpj` (único) 
+- `endereço` 
+- `lead_time` 
+- `email` (multivalorado) 
+- `telefone` (multivalorado) 
 
-  telefone 
+### Produto 
 
-  endereço 
+- `id_produto` (chave primária) 
+- `nome` 
+- `quantidade_estoque` 
+- `validade` 
+- `preço` 
+- `id_fornecedor` (chave estrangeira → Fornecedor) 
+- `categoria` (multivalorado) 
 
-   email 
+### Pedido 
 
-## Produto: 
+- `id_pedido` (chave primária) 
+- `id_cliente` (chave estrangeira → Cliente) 
+- `data_pedido` 
+- `valor_total` (derivado) 
+- `forma_pagamento` (DINHEIRO, CARTAO, PIX, FIADO) 
+- `status` (PENDENTE, PAGO, CANCELADO) 
 
-  id_produto (chave primária) 
+### ItemPedido 
 
-  nome 
+- `id_pedido` (chave estrangeira → Pedido, parte da PK composta) 
+- `id_produto` (chave estrangeira → Produto, parte da PK composta) 
+- `quantidade` 
+- `preço_unitário` (congelado no momento da venda) 
+- `subtotal` (derivado: `quantidade × preço_unitário`) 
 
-  quantidade_estoque 
+### Usuário 
 
-   validade 
+- `id_usuario` (chave primária) 
+- `nome` 
+- `email` (único) 
+- `senha_hash` 
+- `papel` (FUNCIONARIO, ADMIN) 
 
-  preço 
+### Relacionamentos 
 
-## Pedido: 
+- **Cliente (1,1) — tem — (0,N) Pedido**: um cliente pode realizar vários pedidos; cada pedido pertence a um único cliente. 
+- **Pedido (1,1) — contém — (1,N) ItemPedido**: cada pedido possui pelo menos um item. 
+- **Produto (1,1) — está em — (0,N) ItemPedido**: um produto pode aparecer em vários pedidos via `ItemPedido`. 
+- **Fornecedor (1,1) — fornece — (1,N) Produto**: um fornecedor abastece vários produtos; cada produto possui um fornecedor. 
 
-  id_pedido (chave primária) 
+A entidade `ItemPedido` resolve o relacionamento muitos-para-muitos entre `Pedido` e `Produto`. Esse modelo garante flexibilidade, permitindo que um pedido contenha múltiplos produtos e que os dados sejam armazenados de forma consistente. 
 
-  id_cliente (chave estrangeira) 
-
-   data_pedido 
-
-   valor_total 
-
-   forma_pagamento 
-
-## ItemPedido: 
-
-  id_item (chave primária) 
-
-  id_pedido (chave estrangeira) 
-
-   id_produto (chave estrangeira) 
-
-   quantidade 
-
-  subtotal 
-
-## Relacionamentos: 
-
-Um cliente pode realizar vários pedidos (1:N). Um pedido pertence a um único cliente. 
-
-Um pedido pode conter vários produtos (1:N). Um produto pode estar presente em vários pedidos. 
-
-A entidade ItemPedido resolve o relacionamento muitos-para-muitos entre Pedido e Produto. 
-
-Esse modelo garante flexibilidade, permitindo que um pedido contenha múltiplos produtos e que os dados sejam armazenados de forma consistente. 
-
-## 9. Considerações Finais
+## 11. Considerações Finais
 O sistema de pedidos para a loja de bebidas proporcionará maior eficiência operacional, segurança e organização. Além disso, permitirá que gestores tenham informações estratégicas para tomada de decisão, reduzindo falhas e aumentando a competitividade da empresa.

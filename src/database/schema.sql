@@ -1,13 +1,16 @@
 -- ============================================================================
--- schema.sql — estrutura do banco de dados (SQL puro)
+-- schema.sql — estrutura do banco de dados (SQL puro, dialeto SQLite)
 -- ============================================================================
--- As tabelas serao adicionadas nos proximos commits, uma por uma:
---   1. clients      — clientes da loja
---   2. users        — fornecedores da loja
---   3. users        — funcionarios do sistema (RF13, RNF04)
---   4. products     — produtos a venda
---   5. orders       — pedidos (vendas)
---   6. order_items  — itens dentro de cada pedido
+-- Tabelas do sistema (alinhadas ao DER em docs/diagramas/der.png):
+--   1. cliente              — clientes da loja
+--      + email_cliente / telefone_cliente   (atributos multivalorados)
+--   2. fornecedor           — fornecedores dos produtos
+--      + email_fornecedor / telefone_fornecedor (atributos multivalorados)
+--   3. usuario              — funcionarios que logam no sistema (RF13, RNF04)
+--   4. produto              — produtos a venda
+--      + categoria_produto                  (atributo multivalorado)
+--   5. pedido               — pedidos (vendas) realizadas por um cliente
+--   6. item_pedido          — itens dentro de cada pedido (resolve N:N)
 -- ============================================================================
 
 -- =====================================================
