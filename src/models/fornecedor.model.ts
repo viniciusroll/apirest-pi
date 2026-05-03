@@ -3,7 +3,7 @@ export interface Fornecedor {
   nome: string;
   cnpj: string;
   endereco: string | null;
-  lead_time: number | null;
+  tempo_entrega: number | null;
   criado_em: string;
 }
 

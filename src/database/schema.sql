@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS fornecedor (
   nome            TEXT NOT NULL,
   cnpj            TEXT NOT NULL UNIQUE,
   endereco        TEXT,
-  lead_time       INTEGER CHECK (lead_time IS NULL OR lead_time >= 0),
+  tempo_entrega   INTEGER CHECK (tempo_entrega IS NULL OR tempo_entrega >= 0),
   criado_em       DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
