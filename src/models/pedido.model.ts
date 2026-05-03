@@ -7,7 +7,6 @@ export interface Pedido {
   forma_pagamento: FormaPagamento;
   status: StatusPedido;
     total_pedido: number;
-    pago: number;
     criado_em: string;
     atualizado_em: string;
 }
@@ -17,7 +16,6 @@ export interface ItemPedido {
     id_pedido: number;
     id_produto: number;
     quantidade: number;
-    preco_unitario: number;
     subtotal: number;
 }
 
@@ -29,5 +27,5 @@ export interface EntradaCriarPedido {
   id_cliente: number;
   forma_pagamento: FormaPagamento;
   status?: StatusPedido;
-  itens: Array<{ id_produto: number; quantidade: number; preco_unitario?: number; subtotal?: number }>;
+  itens: Array<{ id_produto: number; quantidade: number; preco_unitario?: number}>;
 }

@@ -1,13 +1,16 @@
 -- ============================================================================
--- schema.sql — estrutura do banco de dados (SQL puro)
+-- schema.sql — estrutura do banco de dados (SQL puro, dialeto SQLite)
 -- ============================================================================
--- As tabelas serao adicionadas nos proximos commits, uma por uma:
---   1. clients      — clientes da loja
---   2. users        — fornecedores da loja
---   3. users        — funcionarios do sistema (RF13, RNF04)
---   4. products     — produtos a venda
---   5. orders       — pedidos (vendas)
---   6. order_items  — itens dentro de cada pedido
+-- Tabelas do sistema (alinhadas ao DER em docs/diagramas/der.png):
+--   1. cliente              — clientes da loja
+--      + email_cliente / telefone_cliente   (atributos multivalorados)
+--   2. fornecedor           — fornecedores dos produtos
+--      + email_fornecedor / telefone_fornecedor (atributos multivalorados)
+--   3. usuario              — funcionarios que logam no sistema (RF13, RNF04)
+--   4. produto              — produtos a venda
+--      + categoria_produto                  (atributo multivalorado)
+--   5. pedido               — pedidos (vendas) realizadas por um cliente
+--   6. item_pedido          — itens dentro de cada pedido (resolve N:N)
 -- ============================================================================
 
 -- =====================================================
@@ -106,7 +109,6 @@ CREATE INDEX IF NOT EXISTS idx_usuario_email ON usuario(email);
 -- =====================================================
 -- Tabela: produto
 -- Produtos disponiveis para venda (PDF secao 4).
--- Atributo multivalorado: categoria (um produto pode ter varias).
 -- =====================================================
 CREATE TABLE IF NOT EXISTS produto (
   id_produto         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -114,6 +116,7 @@ CREATE TABLE IF NOT EXISTS produto (
   preco              REAL    NOT NULL CHECK (preco > 0),
   estoque            INTEGER NOT NULL DEFAULT 0 CHECK (estoque >= 0),
   validade           DATE,
+  categoria          TEXT,
   id_fornecedor      INTEGER,
   criado_em          DATETIME DEFAULT CURRENT_TIMESTAMP,
   atualizado_em      DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -128,22 +131,16 @@ BEGIN
   UPDATE produto SET atualizado_em = CURRENT_TIMESTAMP WHERE id_produto = OLD.id_produto;
 END;
 
--- Multivalorado: categorias do produto
-CREATE TABLE IF NOT EXISTS categoria_produto (
-  id            INTEGER PRIMARY KEY AUTOINCREMENT,
-  id_produto    INTEGER NOT NULL,
-  categoria     TEXT NOT NULL,
-  UNIQUE (id_produto, categoria),
-  FOREIGN KEY (id_produto) REFERENCES produto(id_produto) ON DELETE CASCADE
-);
+CREATE INDEX IF NOT EXISTS idx_produto_categoria        ON produto(categoria);
 
 -- =====================================================
 -- Tabela: pedido
 -- Vendas realizadas (RF03).
 -- Vinculada a UM cliente (RN03).
 -- total_pedido sera calculado pelo service (RN02).
--- pago = 0 quando forma_pagamento = 'FIADO' (RF10/RN06 — cliente em debito).
--- status permite cancelar pedidos (RF12).
+-- status PENDENTE em pedidos FIADO indica cliente em debito
+-- (RF10/RN06). Quando o cliente quita, vira PAGO.
+-- status CANCELADO permite cancelar pedidos (RF12).
 -- =====================================================
 CREATE TABLE IF NOT EXISTS pedido (
   id_pedido         INTEGER  PRIMARY KEY AUTOINCREMENT,
@@ -151,7 +148,6 @@ CREATE TABLE IF NOT EXISTS pedido (
   forma_pagamento   TEXT     NOT NULL CHECK (forma_pagamento IN ('DINHEIRO','CARTAO','PIX','FIADO')),
   status            TEXT     NOT NULL DEFAULT 'PAGO' CHECK (status IN ('PENDENTE','PAGO','CANCELADO')),
   total_pedido      REAL     NOT NULL DEFAULT 0 CHECK (total_pedido >= 0),
-  pago              INTEGER  NOT NULL DEFAULT 1 CHECK (pago IN (0,1)),
   criado_em         DATETIME DEFAULT CURRENT_TIMESTAMP,
   atualizado_em     DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
@@ -167,7 +163,6 @@ END;
 
 CREATE INDEX IF NOT EXISTS idx_pedido_cliente   ON pedido(id_cliente);
 CREATE INDEX IF NOT EXISTS idx_pedido_status    ON pedido(status);
-CREATE INDEX IF NOT EXISTS idx_pedido_pago      ON pedido(pago);
 
 -- =====================================================
 -- Tabela: item_pedido
@@ -175,7 +170,6 @@ CREATE INDEX IF NOT EXISTS idx_pedido_pago      ON pedido(pago);
 -- Resolve o N:N entre pedido e produto.
 -- preco_unitario e CONGELADO no momento da venda — se o preco do
 -- produto mudar amanha, o pedido de hoje preserva o valor cobrado.
--- subtotal = quantidade * preco_unitario (calculado pelo service).
 -- =====================================================
 CREATE TABLE IF NOT EXISTS item_pedido (
   id_item          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -183,7 +177,6 @@ CREATE TABLE IF NOT EXISTS item_pedido (
   id_produto       INTEGER NOT NULL,
   quantidade       INTEGER NOT NULL CHECK (quantidade > 0),
   preco_unitario   REAL    NOT NULL CHECK (preco_unitario > 0),
-  subtotal         REAL    NOT NULL CHECK (subtotal > 0),
   FOREIGN KEY (id_pedido)  REFERENCES pedido(id_pedido) ON DELETE CASCADE,
   FOREIGN KEY (id_produto) REFERENCES produto(id_produto)
 );
