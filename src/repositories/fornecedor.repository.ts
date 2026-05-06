@@ -4,10 +4,14 @@ import {
     Fornecedor, 
     EmailFornecedor, 
     TelefoneFornecedor,
+    EntradaCriarFornecedor,
+    EntradaAtualizarFornecedor,
     FornecedorCompleto
 } from "../models/fornecedor.model";
+import { resolve } from "path";
 
 export const fornecedorRepository = {
+
     // --------------------------------------------------------------------------
     // Lista TODOS os fornecedores
     // --------------------------------------------------------------------------
@@ -19,6 +23,7 @@ export const fornecedorRepository = {
             });
         });
     },
+    
     // --------------------------------------------------------------------------
     // Busca cliente por ID
     // --------------------------------------------------------------------------
@@ -34,4 +39,20 @@ export const fornecedorRepository = {
             );
         });
     },
+    
+    // --------------------------------------------------------------------------
+    // Busca fornecedor por CNPJ (para evitar duplicidade)
+    // --------------------------------------------------------------------------
+    findByCNPJ(cnpj: string): Promise<Fornecedor | null> {
+        return new Promise((resolve, reject) => {
+            db.get(
+                "SELECT * FROM Fornecedor WHERE cnpj = ?",
+                [cnpj],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve((row as Fornecedor) ?? null);
+                }
+            );
+        });
+    }
 }
