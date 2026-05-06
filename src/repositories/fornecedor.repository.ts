@@ -25,7 +25,7 @@ export const fornecedorRepository = {
     },
     
     // --------------------------------------------------------------------------
-    // Busca cliente por ID
+    // Busca fornecedor por ID
     // --------------------------------------------------------------------------
     findByID(id: number): Promise<Fornecedor | null> {
         return new Promise((resolve, reject) => {
