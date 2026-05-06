@@ -15,8 +15,23 @@ export const fornecedorRepository = {
         return new Promise((resolve, reject) => {
             db.all("SELECT * FROM fornecedor ORDER BY id_fornecedor;", (err, rows) => {
                 if (err) reject(err);
-                else resolve(rows as Fornecedor[])
+                else resolve(rows as Fornecedor[]);
             });
         });
-    }
+    },
+    // --------------------------------------------------------------------------
+    // Busca cliente por ID
+    // --------------------------------------------------------------------------
+    findByID(id: number): Promise<Fornecedor | null> {
+        return new Promise((resolve, reject) => {
+            db.get(
+                "SELECT * FROM fornecedores WHERE id_fornecedor = ?;",
+                [id],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve((row as Fornecedor) ?? null);
+                }
+            );
+        });
+    },
 }
