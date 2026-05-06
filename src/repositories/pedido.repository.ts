@@ -63,4 +63,48 @@ createPedido(
       }
     });
   },
+  update(
+  id: number,
+  input: { status?: string; forma_pagamento?: string }
+): Promise<PedidoComItens | null> {
+  return new Promise((resolve, reject) => {
+    const fields: string[] = [];
+    const values: unknown[] = [];
+
+    if (input.status !== undefined) {
+      fields.push("status = ?");
+      values.push(input.status);
+    }
+    if (input.forma_pagamento !== undefined) {
+      fields.push("forma_pagamento = ?");
+      values.push(input.forma_pagamento);
+    }
+
+    if (fields.length === 0) {
+      return pedidoRepository.findById(id).then(resolve).catch(reject);
+    }
+
+    values.push(id);
+
+    const sql = `UPDATE pedido SET ${fields.join(", ")}, atualizado_em = datetime('now') WHERE id_pedido = ?`;
+    db.run(sql, values, (err: Error | null) => {
+      if (err) return reject(err);
+      pedidoRepository.findById(id).then(resolve).catch(reject);
+    });
+  });
+},
+
+delete(id: number): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    db.run(
+      "DELETE FROM pedido WHERE id_pedido = ?",
+      [id],
+      function (this: sqlite3.RunResult, err: Error | null) {
+        if (err) reject(err);
+        else resolve(this.changes > 0);
+      }
+    );
+  });
+},
+
 };
