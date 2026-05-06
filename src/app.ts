@@ -23,7 +23,7 @@ app.use(express.json());
 // --------------------------------------------------------------------------
 // Rotas
 // --------------------------------------------------------------------------
-// Por enquanto so registramos /produtos e /clientes. Outras rotas (clientes, pedidos,
+// Por enquanto so registramos /produtos e /clientes. Outras rotas (pedidos,
 // usuario, fornecedor, relatorios) entrarao quando seus modulos ficarem
 // prontos.
 // --------------------------------------------------------------------------
