@@ -31,3 +31,8 @@ export async function buscarFornecedorPorID(id: number) {
 export async function atualizarFornecedor(id: number, dados: EntradaAtualizarFornecedor) {
     return repo.update(id, dados);
 }
+
+// Exclui o fornecedor.
+export async function excluirFornecedor(id: number) {
+    return repo.delete(id);
+}
