@@ -58,3 +58,10 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 export default app;
+
+// Registro do Swagger UI para documentacao interativa da API
+import swaggerUi from 'swagger-ui-express'
+import { swaggerSpec } from './config/swagger'
+
+// Adicionar antes das outras rotas:
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
