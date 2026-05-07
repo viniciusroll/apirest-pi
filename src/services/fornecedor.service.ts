@@ -22,4 +22,8 @@ export async function listarFornecedores() {
     return repo.findAll();
 }
 
+// Busca o fornecedor por ID.
+export async function buscarFornecedorPorID(id:number) {
+    return repo.findCompleteByID(id)
+}
 
