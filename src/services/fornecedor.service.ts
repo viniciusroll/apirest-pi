@@ -5,6 +5,7 @@ import {
     FornecedorCompleto
 } from "../models/fornecedor.model";
 
+// Cria o fornecedor.
 export async function criarFornecedor(
     dados: EntradaCriarFornecedor & { emails: string[], telefones: string[] }
 ): Promise<FornecedorCompleto> {
@@ -15,3 +16,10 @@ export async function criarFornecedor(
 
     return repo.create(dados, dados.emails, dados.telefones);
 }
+
+// Lista todos os fornecedores.
+export async function listarFornecedores() {
+    return repo.findAll();
+}
+
+
