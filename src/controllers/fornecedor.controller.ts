@@ -24,3 +24,13 @@ export async function buscarFornecedorPorID(req: Request, res: Response) {
     if (!fornecedor) return res.status(404).json({ erro: "Fornecedor não encontrado" });
     res.json(fornecedor);
 }
+
+export async function atualizarFornecedor(req: Request, res: Response) {
+    try {
+        const dados = atualizarFornecedorSchema.parse(req.body);
+        const fornecedor = await service.atualizarFornecedor(Number(req.params.id), dados);
+        res.json(fornecedor);
+    } catch(err: any) {
+        res.status(400).json({ erro: err.message });
+    }
+}
