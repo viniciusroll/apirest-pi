@@ -12,3 +12,8 @@ export async function criarFornecedor(req: Request, res: Response) {
         res.status(400).json({ erro: err.message });
     }
 }
+
+export async function listarFornecedores(req: Request, res: Response) {
+    const fornecedores = await service.listarFornecedores();
+    res.json(fornecedores);
+}
