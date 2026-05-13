@@ -1,10 +1,10 @@
 //Adiciona todas as rotas do projeto    
 import { Router } from "express";
 
-import clienteRouter from "./cliente.routes";
-import fornecedorRouter from "./fornecedor.routes";
-import pedidoRouter from "./pedido.routes";
-import produtoRouter from "./produto.routes";
+import clienteRouter from "./cliente.route";
+import fornecedorRouter from "./fornecedor.route";
+import pedidoRouter from "./pedido.route";
+import produtoRouter from "./produto.route";
 
 const router = Router();
 router.use("/clientes", clienteRouter);
