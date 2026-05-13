@@ -53,6 +53,10 @@ export async function atualizarPedido(id: number, status?: StatusPedido, forma_p
   return pedidoRepository.update(id, { status, forma_pagamento });
 }
 
+export async function listarPedidosPorCliente(id_cliente: number) {
+  return pedidoRepository.findByClienteId(id_cliente);
+}
+
 export async function excluirPedido(id: number) {
   const pedido = await pedidoRepository.findById(id);
   if (!pedido) throw new AppError("Pedido não encontrado", 404);
