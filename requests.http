@@ -1,0 +1,215 @@
+### ========== FORNECEDORES ==========
+
+### Listar todos os fornecedores
+GET http://localhost:3000/fornecedores
+
+### Buscar fornecedor por ID
+GET http://localhost:3000/fornecedores/1
+
+### Criar fornecedor
+POST http://localhost:3000/fornecedores
+Content-Type: application/json
+
+{
+  "nome": "Distribuidora Bebidas Sul",
+  "cnpj": "12345678000190",
+  "endereco": "Rua das Industrias, 500 - Campinas/SP",
+  "tempo_entrega": 3,
+  "emails": ["contato@bebidasul.com", "vendas@bebidasul.com"],
+  "telefones": ["19999990001", "1932320001"]
+}
+
+### Atualizar fornecedor
+PUT http://localhost:3000/fornecedores/1
+Content-Type: application/json
+
+{
+  "tempo_entrega": 5
+}
+
+### Remover fornecedor
+DELETE http://localhost:3000/fornecedores/1
+
+
+### ========== PRODUTOS ==========
+
+### Listar todos os produtos
+GET http://localhost:3000/produtos
+
+### Buscar produto por ID
+GET http://localhost:3000/produtos/1
+
+### Criar produto
+POST http://localhost:3000/produtos
+Content-Type: application/json
+
+{
+  "nome": "Skol Lata 350ml",
+  "estoque": 100,
+  "validade": "2026-12-31",
+  "preco": 3.50,
+  "categoria": "CERVEJA",
+  "id_fornecedor": 1
+}
+
+### Criar outro produto
+POST http://localhost:3000/produtos
+Content-Type: application/json
+
+{
+  "nome": "Coca-Cola 2L",
+  "estoque": 50,
+  "validade": "2026-10-15",
+  "preco": 10.90,
+  "categoria": "REFRIGERANTE",
+  "id_fornecedor": 1
+}
+
+### Atualizar produto (parcial)
+PUT http://localhost:3000/produtos/1
+Content-Type: application/json
+
+{
+  "preco": 3.99,
+  "estoque": 120
+}
+
+### Remover produto
+DELETE http://localhost:3000/produtos/1
+
+
+### ========== CLIENTES ==========
+
+### Listar todos os clientes
+GET http://localhost:3000/clientes
+
+### Buscar cliente por ID
+GET http://localhost:3000/clientes/1
+
+### Criar cliente
+POST http://localhost:3000/clientes
+Content-Type: application/json
+
+{
+  "nome": "Maria Silva",
+  "cpf": "12345678901",
+  "endereco": "Rua das Flores, 123 - Sorocaba/SP",
+  "emails": ["maria@email.com", "maria.silva@trabalho.com"],
+  "telefones": ["15999990001"]
+}
+
+### Criar outro cliente
+POST http://localhost:3000/clientes
+Content-Type: application/json
+
+{
+  "nome": "Joao Pereira",
+  "cpf": "98765432100",
+  "endereco": "Av. Brasil, 456 - Sorocaba/SP",
+  "emails": ["joao@email.com", "joao.pessoal@email.com"],
+  "telefones": ["15999990002", "1533330002"]
+}
+
+### Atualizar cliente (parcial)
+PUT http://localhost:3000/clientes/1
+Content-Type: application/json
+
+{
+  "endereco": "Rua das Flores, 200 - Sorocaba/SP"
+}
+
+### Listar pedidos de um cliente
+GET http://localhost:3000/clientes/1/pedidos
+
+### Remover cliente
+DELETE http://localhost:3000/clientes/1
+
+
+### ========== PEDIDOS ==========
+
+### Criar pedido
+POST http://localhost:3000/pedidos
+Content-Type: application/json
+
+{
+  "id_cliente": 1,
+  "forma_pagamento": "PIX",
+  "itens": [
+    { "id_produto": 1, "quantidade": 12 },
+    { "id_produto": 2, "quantidade": 3 }
+  ]
+}
+
+### Criar pedido fiado
+POST http://localhost:3000/pedidos
+Content-Type: application/json
+
+{
+  "id_cliente": 2,
+  "forma_pagamento": "FIADO",
+  "itens": [
+    { "id_produto": 1, "quantidade": 6 }
+  ]
+}
+
+### Buscar pedido por ID
+GET http://localhost:3000/pedidos/1
+
+### Atualizar status do pedido
+PUT http://localhost:3000/pedidos/1
+Content-Type: application/json
+
+{
+  "status": "PAGO"
+}
+
+### Cancelar pedido
+PUT http://localhost:3000/pedidos/2
+Content-Type: application/json
+
+{
+  "status": "CANCELADO"
+}
+
+### Excluir pedido
+DELETE http://localhost:3000/pedidos/2
+
+
+### ========== CASOS DE ERRO ==========
+
+### 400 - Produto sem nome
+POST http://localhost:3000/produtos
+Content-Type: application/json
+
+{
+  "preco": 10.00,
+  "estoque": 5
+}
+
+### 400 - CPF invalido
+POST http://localhost:3000/clientes
+Content-Type: application/json
+
+{
+  "nome": "Teste",
+  "cpf": "123",
+  "endereco": "Rua Teste, 1",
+  "emails": ["teste@email.com"],
+  "telefones": ["15999990000"]
+}
+
+### 400 - Pedido sem itens
+POST http://localhost:3000/pedidos
+Content-Type: application/json
+
+{
+  "id_cliente": 1,
+  "forma_pagamento": "DINHEIRO",
+  "itens": []
+}
+
+### 404 - Produto inexistente
+GET http://localhost:3000/produtos/9999
+
+### 404 - Cliente inexistente
+GET http://localhost:3000/clientes/9999
