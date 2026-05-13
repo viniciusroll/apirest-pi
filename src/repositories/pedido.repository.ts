@@ -94,6 +94,19 @@ createPedido(
   });
 },
 
+findByClienteId(id_cliente: number): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    db.all(
+      "SELECT * FROM pedido WHERE id_cliente = ? ORDER BY id_pedido DESC",
+      [id_cliente],
+      (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows as any[]);
+      }
+    );
+  });
+},
+  
 delete(id: number): Promise<boolean> {
   return new Promise((resolve, reject) => {
     db.run(
