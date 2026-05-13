@@ -12,5 +12,6 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 app.listen(PORT, () => {
   console.log(`✓ Servidor rodando em http://localhost:${PORT}`);
-  console.log(`  Rotas disponiveis: GET POST PUT DELETE /produtos`);
+  console.log(`  Rotas disponiveis: GET POST PUT DELETE`);
+  console.log(`  /produtos /clientes /pedidos /fornecedores`)
 });

@@ -25,8 +25,8 @@ app.use(express.json());
 // --------------------------------------------------------------------------
 // Rotas
 // --------------------------------------------------------------------------
-// Por enquanto so registramos /produtos, /clientes e /Pedidos Outras rotas
-// (usuario, fornecedor, relatorios) entrarao quando seus modulos ficarem
+// Por enquanto so registramos /produtos, /clientes, /pedidos e /fornecedores.
+// Outras rotas (usuario, relatorios) entrarao quando seus modulos ficarem
 // prontos.
 // --------------------------------------------------------------------------
 app.use("/produtos", produtoRoutes);
