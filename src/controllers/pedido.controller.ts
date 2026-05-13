@@ -2,6 +2,16 @@ import { Request, Response, NextFunction } from "express";
 import * as service from "../services/pedido.service";
 import { criarPedidoSchema, atualizarPedidoSchema } from "../schemas/pedido.schema";
 
+export async function listarPedidosPorCliente(req: Request, res: Response, next: NextFunction) {
+  try {
+    const id = Number(req.params.id);
+    const pedidos = await service.listarPedidosPorCliente(id);
+    res.json(pedidos);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function criarPedido(req: Request, res: Response, next: NextFunction) {
   try {
     const dados = criarPedidoSchema.parse(req.body);
