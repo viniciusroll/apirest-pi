@@ -5,6 +5,7 @@ import { PedidoComItens, ItemPedido } from "../models/pedido.model";
 export const pedidoRepository = {
 createPedido(
   id_cliente: number,
+  id_usuario: number,
   forma_pagamento: string,
   status: string,
   itens: { id_produto: number; quantidade: number; preco_unitario: number }[],
@@ -12,20 +13,19 @@ createPedido(
 ): Promise<PedidoComItens> {
   return new Promise((resolve, reject) => {
     db.run(
-      `INSERT INTO pedido (id_cliente, forma_pagamento, status, total_pedido, criado_em, atualizado_em)
-       VALUES (?, ?, ?, ?, datetime('now'), datetime('now'))`,
-      [id_cliente, forma_pagamento, status, total],
+      `INSERT INTO pedido (id_cliente, id_usuario, forma_pagamento, status, total_pedido, criado_em, atualizado_em)
+       VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      [id_cliente, id_usuario, forma_pagamento, status, total],
       function (this: sqlite3.RunResult, err: Error | null) {
         if (err) return reject(err);
 
         const id_pedido = this.lastID;
 
         itens.forEach((item) => {
-          const subtotal = item.preco_unitario * item.quantidade;
           db.run(
-            `INSERT INTO item_pedido (id_pedido, id_produto, quantidade, subtotal)
+            `INSERT INTO item_pedido (id_pedido, id_produto, quantidade, preco_unitario)
              VALUES (?, ?, ?, ?)`,
-            [id_pedido, item.id_produto, item.quantidade, subtotal]
+            [id_pedido, item.id_produto, item.quantidade, item.preco_unitario]
           );
         });
 

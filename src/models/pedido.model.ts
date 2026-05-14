@@ -17,7 +17,7 @@ export interface ItemPedido {
     id_pedido: number;
     id_produto: number;
     quantidade: number;
-    subtotal: number;
+    preco_unitario: number;
 }
 
 export interface PedidoComItens extends Pedido {
