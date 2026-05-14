@@ -233,8 +233,9 @@ As principais entidades identificadas foram:
 - **Cliente**: armazena os dados dos clientes cadastrados no sistema. 
 - **Fornecedor**: armazena os dados dos fornecedores que abastecem os produtos. 
 - **Produto**: armazena as informações dos produtos disponíveis para venda, vinculados a um fornecedor. 
-- **Pedido**: representa as vendas realizadas, associando clientes aos produtos adquiridos. 
+- **Pedido**: representa as vendas realizadas, associando clientes e usuários aos produtos adquiridos. 
 - **ItemPedido**: detalha os produtos contidos em cada pedido (entidade fraca que resolve o N:N entre `Pedido` e `Produto`). 
+- **MovimentoEstoque**: registra as movimentações de entrada e saída de estoque, vinculadas a produtos, itens de pedido e usuários. 
 - **Usuário**: representa os funcionários autorizados a operar o sistema (atende ao RF13 e RNF04). 
 
 A seguir, são descritas as entidades e seus principais atributos: 
@@ -245,8 +246,10 @@ A seguir, são descritas as entidades e seus principais atributos:
 - `nome` 
 - `cpf` (único) 
 - `endereço` 
-- `email` (multivalorado) 
-- `telefone` (multivalorado) 
+- `telefone` (multivalorado — tabela `telefone_cliente`) 
+- `email` (multivalorado — tabela `email_cliente`) 
+- `criado_em` 
+- `atualizado_em` 
 
 ### Fornecedor 
 
@@ -255,34 +258,51 @@ A seguir, são descritas as entidades e seus principais atributos:
 - `cnpj` (único) 
 - `endereço` 
 - `tempo_entrega` 
-- `email` (multivalorado) 
-- `telefone` (multivalorado) 
+- `telefone` (multivalorado — tabela `telefone_fornecedor`) 
+- `email` (multivalorado — tabela `email_fornecedor`) 
+- `criado_em` 
+- `atualizado_em` 
 
 ### Produto 
 
 - `id_produto` (chave primária) 
 - `nome` 
+- `preco` 
 - `estoque` 
 - `validade` 
-- `preço` 
 - `id_fornecedor` (chave estrangeira → Fornecedor) 
 - `categoria` 
+- `criado_em` 
+- `atualizado_em` 
 
 ### Pedido 
 
 - `id_pedido` (chave primária) 
 - `id_cliente` (chave estrangeira → Cliente) 
-- `data_pedido` 
-- `valor_total` (derivado) 
+- `id_usuario` (chave estrangeira → Usuário) 
 - `forma_pagamento` (DINHEIRO, CARTAO, PIX, FIADO) 
 - `status` (PENDENTE, PAGO, CANCELADO) 
+- `total_pedido` (derivado) 
+- `criado_em` 
+- `atualizado_em` 
 
 ### ItemPedido 
 
-- `id_pedido` (chave estrangeira → Pedido, parte da PK composta) 
-- `id_produto` (chave estrangeira → Produto, parte da PK composta) 
+- `id_item` (chave primária) 
+- `id_pedido` (chave estrangeira → Pedido) 
+- `id_produto` (chave estrangeira → Produto) 
 - `quantidade` 
-- `preço_unitário` (congelado no momento da venda)  
+- `preco_unitario` (congelado no momento da venda)  
+
+### MovimentoEstoque 
+
+- `id_movimento` (chave primária) 
+- `id_produto` (chave estrangeira → Produto) 
+- `id_usuario` (chave estrangeira → Usuário) 
+- `id_item` (chave estrangeira → ItemPedido) 
+- `tipo` (ENTRADA, SAIDA) 
+- `quantidade` 
+- `data_movimento` 
 
 ### Usuário 
 
@@ -291,15 +311,21 @@ A seguir, são descritas as entidades e seus principais atributos:
 - `email` (único) 
 - `senha_hash` 
 - `papel` (FUNCIONARIO, ADMIN) 
+- `criado_em` 
+- `atualizado_em` 
 
 ### Relacionamentos 
 
-- **Cliente (1,1) — tem — (0,N) Pedido**: um cliente pode realizar vários pedidos; cada pedido pertence a um único cliente. 
-- **Pedido (1,1) — contém — (1,N) ItemPedido**: cada pedido possui pelo menos um item. 
-- **Produto (1,1) — está em — (0,N) ItemPedido**: um produto pode aparecer em vários pedidos via `ItemPedido`. 
-- **Fornecedor (1,1) — fornece — (1,N) Produto**: um fornecedor abastece vários produtos; cada produto possui um fornecedor. 
+- **Cliente (1,1) — Comprar — (0,N) Pedido**: um cliente pode realizar vários pedidos; cada pedido pertence a um único cliente. 
+- **Usuário (1,1) — Registrar — (0,N) Pedido**: um usuário pode registrar vários pedidos; cada pedido é registrado por um único usuário. 
+- **Pedido (1,1) — Possuir — (0,N) ItemPedido**: cada pedido pode possuir vários itens. 
+- **Produto (1,1) — Estar_em — (0,N) ItemPedido**: um produto pode aparecer em vários pedidos via `ItemPedido`. 
+- **Fornecedor (1,1) — Fornecer — (0,N) Produto**: um fornecedor abastece vários produtos; cada produto possui um fornecedor. 
+- **Produto (1,1) — Reajustar — (0,N) MovimentoEstoque**: um produto pode ter várias movimentações de estoque. 
+- **ItemPedido (0,1) — Referenciar — (0,N) MovimentoEstoque**: um item de pedido pode gerar movimentações de estoque. 
+- **Usuário (1,1) — Controlar — (0,N) MovimentoEstoque**: um usuário pode controlar várias movimentações de estoque. 
 
-A entidade `ItemPedido` resolve o relacionamento muitos-para-muitos entre `Pedido` e `Produto`. Esse modelo garante flexibilidade, permitindo que um pedido contenha múltiplos produtos e que os dados sejam armazenados de forma consistente. 
+A entidade `ItemPedido` resolve o relacionamento muitos-para-muitos entre `Pedido` e `Produto`. A entidade `MovimentoEstoque` registra todas as entradas e saídas de estoque, vinculando-se a produtos, itens de pedido e usuários responsáveis. Esse modelo garante rastreabilidade completa das operações. 
 
 ## 11. Considerações Finais
 O sistema de pedidos para a loja de bebidas proporcionará maior eficiência operacional, segurança e organização. Além disso, permitirá que gestores tenham informações estratégicas para tomada de decisão, reduzindo falhas e aumentando a competitividade da empresa.
