@@ -1,16 +1,16 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import * as service from "../services/fornecedor.service"
 import { criarFornecedorSchema, atualizarFornecedorSchema } from "../schemas/fornecedor.schema"
 import { number } from "zod/v4";
 
 
-export async function criarFornecedor(req: Request, res: Response) {
+export async function criarFornecedor(req: Request, res: Response, next: NextFunction) {
     try {
         const dados = criarFornecedorSchema.parse(req.body);
         const fornecedor = await service.criarFornecedor(dados);
         res.status(201).json(fornecedor);
-    } catch (err: any) {
-        res.status(400).json({ erro: err.message });
+    } catch (err) {
+        next(err)
     }
 }
 
@@ -25,13 +25,13 @@ export async function buscarFornecedorPorID(req: Request, res: Response) {
     res.json(fornecedor);
 }
 
-export async function atualizarFornecedor(req: Request, res: Response) {
+export async function atualizarFornecedor(req: Request, res: Response, next: NextFunction) {
     try {
         const dados = atualizarFornecedorSchema.parse(req.body);
         const fornecedor = await service.atualizarFornecedor(Number(req.params.id), dados);
         res.json(fornecedor);
-    } catch(err: any) {
-        res.status(400).json({ erro: err.message });
+    } catch(err) {
+        next(err)
     }
 }
 
