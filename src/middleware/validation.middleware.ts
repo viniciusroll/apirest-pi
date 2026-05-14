@@ -15,12 +15,6 @@ export function validar(schema: ZodSchema) {
       req.body = schema.parse(req.body);
       next();
     } catch (err) {
-      if (err instanceof ZodError) {
-        return res.status(400).json({
-          erro: "Dados inválidos",
-          detalhes: err.flatten().fieldErrors,
-        });
-      }
       next(err);
     }
   };
