@@ -1,7 +1,10 @@
+import { authMiddleware } from "../middleware/auth.middleware";
 import { Router } from "express";
 import { relatorioController } from "../controllers/relatorio.controller";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 // GET /relatorios/inadimplentes
 // Retorna clientes com pedidos FIADO + PENDENTE e o valor em aberto

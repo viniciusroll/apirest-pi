@@ -12,6 +12,18 @@ db.serialize(() => {
   db.run("DELETE FROM email_cliente");
   db.run("DELETE FROM telefone_cliente");
   db.run("DELETE FROM cliente");
+  db.run("DELETE FROM usuario");
+
+const SENHA_HASH = "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhy";
+
+db.run(
+  "INSERT INTO usuario (nome, email, senha_hash, papel) VALUES (?, ?, ?, ?)",
+  ["Administrador", "admin@loja.com", SENHA_HASH, "ADMIN"]
+);
+db.run(
+  "INSERT INTO usuario (nome, email, senha_hash, papel) VALUES (?, ?, ?, ?)",
+  ["Administrador", "admin@loja.com", SENHA_HASH, "ADMIN"]
+);
 
   // --- Fornecedores ---
   db.run(
