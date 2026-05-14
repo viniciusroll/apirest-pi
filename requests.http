@@ -213,3 +213,39 @@ GET http://localhost:3000/produtos/9999
 
 ### 404 - Cliente inexistente
 GET http://localhost:3000/clientes/9999
+
+### ========== AUTENTICAÇÃO ==========
+
+### Registrar novo usuário
+POST http://localhost:3000/auth/registrar
+Content-Type: application/json
+
+{
+  "nome": "Admin PI",
+  "email": "admin@loja.com",
+  "senha": "senha123",
+  "papel": "ADMIN"
+}
+
+### Login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@loja.com",
+  "senha": "senha123"
+}
+
+### ========== RELATÓRIOS ==========
+
+### Clientes inadimplentes
+GET http://localhost:3000/relatorios/inadimplentes
+
+### Vendas do mês atual
+GET http://localhost:3000/relatorios/vendas?inicio=2025-05-01&fim=2025-05-31
+
+### Top 5 produtos mais vendidos
+GET http://localhost:3000/relatorios/produtos-mais-vendidos?limite=5
+
+### Produtos com estoque abaixo de 15 unidades
+GET http://localhost:3000/relatorios/estoque-baixo?limite=15
