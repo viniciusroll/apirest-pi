@@ -4,6 +4,7 @@ import {
     EntradaAtualizarFornecedor, 
     FornecedorCompleto
 } from "../models/fornecedor.model";
+import { AppError } from "../errors/app-error";
 
 // Cria o fornecedor.
 export async function criarFornecedor(
@@ -11,7 +12,7 @@ export async function criarFornecedor(
 ): Promise<FornecedorCompleto> {
     const existente = await repo.findByCNPJ(dados.cnpj);
     if (existente) {
-        throw new Error("Já existe um fornecedor com esse CNPJ.");
+        throw new AppError("Já existe um fornecedor com esse CNPJ.", 409);
     }
 
     return repo.create(dados, dados.emails, dados.telefones);
