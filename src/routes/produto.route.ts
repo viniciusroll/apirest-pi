@@ -1,3 +1,4 @@
+import { authMiddleware } from "../middleware/auth.middleware";
 // ============================================================================
 // produto.routes.ts — definicao das rotas da entidade Produto
 // ============================================================================
@@ -21,6 +22,8 @@ import { Router } from "express";
 import { produtoController } from "../controllers/produto.controller";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 // --------------------------------------------------------------------------
 // Padrao REST das rotas:
