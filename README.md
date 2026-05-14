@@ -46,7 +46,7 @@ Servidor em http://localhost:3000
 | `npm run build` | Compila TypeScript para `dist/` |
 | `npm start` | Roda a build (`node dist/server.js`) |
 | `npm run db:init` | Aplica `src/database/schema.sql` em `database.db` |
-| `npm run db:seed` | Popula o banco com dados de exemplo (a implementar) |
+| `npm run db:seed` | Popula o banco com dados de exemplo |
 
 ## Variáveis de ambiente (`.env`)
 
@@ -73,7 +73,8 @@ apirest-pi/
 │   ├── controllers/                 # Camada HTTP (req/res)
 │   ├── database/
 │   │   ├── schema.sql               # DDL do banco
-│   │   └── init.ts                  # Script de inicialização
+│   │   ├── init.ts                  # Script de inicialização
+│   │   └── seed.ts                  # Dados de exemplo
 │   ├── middleware/                  # auth, validação, erros
 │   ├── models/                      # Interfaces TypeScript das entidades
 │   ├── repositories/                # Acesso ao banco (SQL)
@@ -86,6 +87,7 @@ apirest-pi/
 │   └── server.ts                    # Bootstrap do servidor
 ├── .env.example
 ├── package.json
+├── requests.http                    # Exemplos de requisições (REST Client)
 └── tsconfig.json
 ```
 
@@ -116,8 +118,9 @@ Diagrama em [docs/diagramas/der.png](docs/diagramas/der.png).
 | `fornecedor` | Fornecedores dos produtos (CNPJ, `tempo_entrega`) |
 | `email_fornecedor` / `telefone_fornecedor` | Atributos multivalorados do fornecedor |
 | `produto` | Produtos à venda (preço, estoque, validade, categoria) |
-| `pedido` | Vendas: `forma_pagamento`, `status`, `total_pedido` |
+| `pedido` | Vendas: `id_usuario`, `forma_pagamento`, `status`, `total_pedido` |
 | `item_pedido` | Itens de cada pedido (`preco_unitario` congelado) |
+| `movimento_estoque` | Movimentações de entrada/saída de estoque |
 | `usuario` | Funcionários autorizados a logar (RF13) |
 
 ### Convenções
@@ -126,6 +129,8 @@ Diagrama em [docs/diagramas/der.png](docs/diagramas/der.png).
 - `status ∈ { PENDENTE, PAGO, CANCELADO }` — `PENDENTE + FIADO` = cliente em débito (RF10/RN06)
 - `preco_unitario` em `item_pedido` é **congelado** no momento da venda (mudanças no preço do produto não afetam pedidos antigos)
 - `total_pedido` é calculado pelo service a partir dos itens (RN02)
+- `movimento_estoque` registra toda entrada/saída — tipo `SAIDA` ao criar pedido, `ENTRADA` para reposição manual
+- `pedido.id_usuario` vincula o funcionário que registrou a venda
 
 ## Requisitos atendidos
 
@@ -136,6 +141,74 @@ Detalhes em [docs/relatorios/entrevista01.md](docs/relatorios/entrevista01.md).
 | Funcionais | RF01 – RF13 |
 | Regras de Negócio | RN01 – RN07 |
 | Não Funcionais | RNF01 – RNF08 |
+
+## Endpoints da API
+
+Base URL: `http://localhost:3000`
+
+### Autenticação (`/auth`) — público
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/auth/registrar` | Cria usuário |
+| POST | `/auth/login` | Retorna JWT |
+
+### Clientes (`/clientes`)
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/clientes` | Listar todos |
+| GET | `/clientes/:id` | Buscar por ID |
+| POST | `/clientes` | Criar cliente |
+| PUT | `/clientes/:id` | Atualizar (parcial) |
+| DELETE | `/clientes/:id` | Remover |
+| GET | `/clientes/:id/pedidos` | Pedidos do cliente |
+
+### Fornecedores (`/fornecedores`)
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/fornecedores` | Listar todos |
+| GET | `/fornecedores/:id` | Buscar por ID |
+| POST | `/fornecedores` | Criar fornecedor |
+| PUT | `/fornecedores/:id` | Atualizar (parcial) |
+| DELETE | `/fornecedores/:id` | Remover |
+
+### Produtos (`/produtos`)
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/produtos` | Listar todos |
+| GET | `/produtos/:id` | Buscar por ID |
+| POST | `/produtos` | Criar produto |
+| PUT | `/produtos/:id` | Atualizar (parcial) |
+| DELETE | `/produtos/:id` | Remover |
+
+### Pedidos (`/pedidos`)
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| POST | `/pedidos` | ✅ JWT | Criar pedido |
+| GET | `/pedidos/:id` | | Buscar por ID |
+| PUT | `/pedidos/:id` | | Atualizar status/pagamento |
+| DELETE | `/pedidos/:id` | | Excluir pedido |
+
+### Movimentos de Estoque (`/movimentos-estoque`) — todos autenticados
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/movimentos-estoque` | Registrar entrada/saída |
+| GET | `/movimentos-estoque` | Listar todos |
+| GET | `/movimentos-estoque/produto/:id_produto` | Listar por produto |
+
+### Relatórios (`/relatorios`)
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/relatorios/inadimplentes` | Clientes em débito |
+| GET | `/relatorios/vendas?inicio=&fim=` | Vendas por período |
+| GET | `/relatorios/produtos-mais-vendidos?limite=` | Top produtos |
+| GET | `/relatorios/estoque-baixo?limite=` | Estoque crítico |
 
 ## Documentação
 
