@@ -4,6 +4,7 @@ import {
   EntradaAtualizarCliente,
   ClienteCompleto,
 } from "../models/cliente.model";
+import { AppError } from "../errors/app-error";
 
 export async function criarCliente(
   dados: EntradaCriarCliente & { emails: string[]; telefones: string[] }
@@ -11,7 +12,7 @@ export async function criarCliente(
   // RN03: cliente deve ter CPF único
   const existente = await repo.findByCpf(dados.cpf);
   if (existente) {
-    throw new Error("Já existe cliente com esse CPF");
+    throw new AppError("Já existe cliente com esse CPF", 409);
   }
 
   return repo.create(dados, dados.emails, dados.telefones);
