@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as service from "../services/pedido.service";
 import { criarPedidoSchema, atualizarPedidoSchema } from "../schemas/pedido.schema";
+import { RequestAutenticado } from "../types";
 
 export async function listarPedidosPorCliente(req: Request, res: Response, next: NextFunction) {
   try {
@@ -12,10 +13,13 @@ export async function listarPedidosPorCliente(req: Request, res: Response, next:
   }
 }
 
-export async function criarPedido(req: Request, res: Response, next: NextFunction) {
+export async function criarPedido(req: RequestAutenticado, res: Response, next: NextFunction) {
   try {
     const dados = criarPedidoSchema.parse(req.body);
-    const pedido = await service.criarPedido(dados);
+    const pedido = await service.criarPedido({
+      ...dados,
+      id_usuario: req.usuario!.id_usuario,
+    });
     res.status(201).json(pedido);
   } catch (err) {
     next(err);

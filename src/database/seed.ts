@@ -2,6 +2,7 @@ import { db } from "../config/database";
 
 db.serialize(() => {
   // Limpa tabelas na ordem correta (respeita foreign keys)
+  db.run("DELETE FROM movimento_estoque");
   db.run("DELETE FROM item_pedido");
   db.run("DELETE FROM pedido");
   db.run("DELETE FROM produto");

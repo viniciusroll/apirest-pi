@@ -29,6 +29,7 @@ export async function criarPedido(dados: EntradaCriarPedido): Promise<PedidoComI
 
   return pedidoRepository.createPedido(
     dados.id_cliente,
+    dados.id_usuario,
     dados.forma_pagamento,
     dados.status ?? "PENDENTE",
     itensProcessados,

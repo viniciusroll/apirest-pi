@@ -5,6 +5,7 @@ export interface Fornecedor {
   endereco: string | null;
   tempo_entrega: number | null;
   criado_em: string;
+  atualizado_em: string;
 }
 
 export interface EmailFornecedor {
@@ -24,5 +25,5 @@ export interface FornecedorCompleto extends Fornecedor {
   telefones: string[];
 }
 
-export type EntradaCriarFornecedor = Omit<Fornecedor, "id_fornecedor" | "criado_em">;
+export type EntradaCriarFornecedor = Omit<Fornecedor, "id_fornecedor" | "criado_em" | "atualizado_em">;
 export type EntradaAtualizarFornecedor = Partial<EntradaCriarFornecedor>;
