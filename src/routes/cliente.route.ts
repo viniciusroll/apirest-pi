@@ -1,14 +1,16 @@
 import { Router } from "express";
 import * as controller from "../controllers/cliente.controller";
-import * as pedidoController from "../controllers/pedido.controller";
+import { listarPedidosPorCliente } from "../controllers/pedido.controller";
 
 const router = Router();
 
-router.post("/", controller.criarCliente);
 router.get("/", controller.listarClientes);
 router.get("/:id", controller.buscarClientePorId);
-router.get("/:id/pedidos", pedidoController.listarPedidosPorCliente);
+router.post("/", controller.criarCliente);
 router.put("/:id", controller.atualizarCliente);
 router.delete("/:id", controller.excluirCliente);
+
+// RF06 / RN05 — histórico de pedidos de um cliente específico
+router.get("/:id/pedidos", listarPedidosPorCliente);
 
 export default router;
