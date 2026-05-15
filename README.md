@@ -216,10 +216,14 @@ Base URL: `http://localhost:3000`
 - [DER (PNG)](docs/diagramas/der.png)
 
 ## Equipe
-Gabriel Verdin
-Leonardo Xu
-Leonardo Tagliamento
-Thiago Freri
-Vinicius Rodrigo
-Willian Pontieri
+
+| Integrante |
+|---|
+| Gabriel Verdin |
+| Leonardo Xu |
+| Leonardo Tagliamento |
+| Thiago Freri |
+| Vinicius Rodrigo |
+| Willian Pontieri |
+
 Projeto Integrador — Fatec, 2º semestre.

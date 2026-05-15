@@ -21,9 +21,9 @@
 -- =====================================================
 CREATE TABLE IF NOT EXISTS cliente (
   id_cliente     INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome           TEXT NOT NULL,
-  cpf            TEXT NOT NULL UNIQUE,
-  endereco       TEXT,
+  nome           VARCHAR(100) NOT NULL,
+  cpf            CHAR(11) NOT NULL UNIQUE,
+  endereco       VARCHAR(200),
   criado_em      DATETIME DEFAULT CURRENT_TIMESTAMP,
   atualizado_em  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -38,7 +38,7 @@ END;
 CREATE TABLE IF NOT EXISTS email_cliente (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
   id_cliente   INTEGER NOT NULL,
-  email        TEXT NOT NULL,
+  email        VARCHAR(150) NOT NULL,
   UNIQUE (id_cliente, email),
   FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente) ON DELETE CASCADE
 );
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS email_cliente (
 CREATE TABLE IF NOT EXISTS telefone_cliente (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
   id_cliente   INTEGER NOT NULL,
-  telefone     TEXT NOT NULL,
+  telefone     VARCHAR(15) NOT NULL,
   UNIQUE (id_cliente, telefone),
   FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente) ON DELETE CASCADE
 );
@@ -62,9 +62,9 @@ CREATE INDEX IF NOT EXISTS idx_telefone_cliente ON telefone_cliente(id_cliente);
 -- =====================================================
 CREATE TABLE IF NOT EXISTS fornecedor (
   id_fornecedor   INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome            TEXT NOT NULL,
-  cnpj            TEXT NOT NULL UNIQUE,
-  endereco        TEXT,
+  nome            VARCHAR(100) NOT NULL,
+  cnpj            CHAR(14) NOT NULL UNIQUE,
+  endereco        VARCHAR(200),
   tempo_entrega   INTEGER CHECK (tempo_entrega IS NULL OR tempo_entrega >= 0),
   criado_em       DATETIME DEFAULT CURRENT_TIMESTAMP,
   atualizado_em   DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -80,7 +80,7 @@ END;
 CREATE TABLE IF NOT EXISTS email_fornecedor (
   id              INTEGER PRIMARY KEY AUTOINCREMENT,
   id_fornecedor   INTEGER NOT NULL,
-  email           TEXT NOT NULL,
+  email           VARCHAR(150) NOT NULL,
   UNIQUE (id_fornecedor, email),
   FOREIGN KEY (id_fornecedor) REFERENCES fornecedor(id_fornecedor) ON DELETE CASCADE
 );
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS email_fornecedor (
 CREATE TABLE IF NOT EXISTS telefone_fornecedor (
   id              INTEGER PRIMARY KEY AUTOINCREMENT,
   id_fornecedor   INTEGER NOT NULL,
-  telefone        TEXT NOT NULL,
+  telefone        VARCHAR(15) NOT NULL,
   UNIQUE (id_fornecedor, telefone),
   FOREIGN KEY (id_fornecedor) REFERENCES fornecedor(id_fornecedor) ON DELETE CASCADE
 );
@@ -103,10 +103,10 @@ CREATE INDEX IF NOT EXISTS idx_telefone_fornecedor ON telefone_fornecedor(id_for
 -- =====================================================
 CREATE TABLE IF NOT EXISTS usuario (
   id_usuario     INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome           TEXT NOT NULL,
-  email          TEXT NOT NULL UNIQUE,
-  senha_hash     TEXT NOT NULL,
-  papel          TEXT NOT NULL DEFAULT 'FUNCIONARIO',
+  nome           VARCHAR(100) NOT NULL,
+  email          VARCHAR(150) NOT NULL UNIQUE,
+  senha_hash     VARCHAR(255) NOT NULL,
+  papel          VARCHAR(20) NOT NULL DEFAULT 'FUNCIONARIO',
   criado_em      DATETIME DEFAULT CURRENT_TIMESTAMP,
   atualizado_em  DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -128,11 +128,11 @@ CREATE INDEX IF NOT EXISTS idx_usuario_email ON usuario(email);
 -- =====================================================
 CREATE TABLE IF NOT EXISTS produto (
   id_produto         INTEGER PRIMARY KEY AUTOINCREMENT,
-  nome               TEXT    NOT NULL,
+  nome               VARCHAR(100) NOT NULL,
   preco              REAL    NOT NULL CHECK (preco > 0),
   estoque            INTEGER NOT NULL DEFAULT 0 CHECK (estoque >= 0),
   validade           DATE,
-  categoria          TEXT,
+  categoria          VARCHAR(50),
   id_fornecedor      INTEGER,
   criado_em          DATETIME DEFAULT CURRENT_TIMESTAMP,
   atualizado_em      DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -162,8 +162,8 @@ CREATE TABLE IF NOT EXISTS pedido (
   id_pedido         INTEGER  PRIMARY KEY AUTOINCREMENT,
   id_cliente        INTEGER  NOT NULL,
   id_usuario        INTEGER  NOT NULL,
-  forma_pagamento   TEXT     NOT NULL CHECK (forma_pagamento IN ('DINHEIRO','CARTAO','PIX','FIADO')),
-  status            TEXT     NOT NULL DEFAULT 'PAGO' CHECK (status IN ('PENDENTE','PAGO','CANCELADO')),
+  forma_pagamento   VARCHAR(10) NOT NULL CHECK (forma_pagamento IN ('DINHEIRO','CARTAO','PIX','FIADO')),
+  status            VARCHAR(10) NOT NULL DEFAULT 'PAGO' CHECK (status IN ('PENDENTE','PAGO','CANCELADO')),
   total_pedido      REAL     NOT NULL DEFAULT 0 CHECK (total_pedido >= 0),
   criado_em         DATETIME DEFAULT CURRENT_TIMESTAMP,
   atualizado_em     DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -215,7 +215,7 @@ CREATE TABLE IF NOT EXISTS movimento_estoque (
   id_produto       INTEGER NOT NULL,
   id_usuario       INTEGER NOT NULL,
   id_item          INTEGER,
-  tipo             TEXT    NOT NULL CHECK (tipo IN ('ENTRADA','SAIDA')),
+  tipo             VARCHAR(10) NOT NULL CHECK (tipo IN ('ENTRADA','SAIDA')),
   quantidade       INTEGER NOT NULL CHECK (quantidade > 0),
   data_movimento   DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (id_produto) REFERENCES produto(id_produto),

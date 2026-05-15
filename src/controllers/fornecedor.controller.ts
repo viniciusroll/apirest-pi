@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as service from "../services/fornecedor.service"
 import { criarFornecedorSchema, atualizarFornecedorSchema } from "../schemas/fornecedor.schema"
-import { number } from "zod/v4";
+
 
 
 export async function criarFornecedor(req: Request, res: Response, next: NextFunction) {
