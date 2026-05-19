@@ -326,4 +326,27 @@ export const fornecedorRepository = {
       throw err;
     }
   },
+
+  // --------------------------------------------------------------------------
+  // Deleta um fornecedor. Retorna true se removeu, false se id nao existia.
+  // --------------------------------------------------------------------------
+  // Nao precisa de transacao nem de apagar os contatos a mao: as tabelas
+  // email_fornecedor / telefone_fornecedor tem FK com ON DELETE CASCADE,
+  // entao o SQLite remove os emails/telefones junto automaticamente
+  // (a conexao tem PRAGMA foreign_keys = ON — ver config/database.ts).
+  //
+  // 'this.changes' = numero de linhas afetadas. Se 0, o id nao existia.
+  // --------------------------------------------------------------------------
+  delete(id: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      db.run(
+        "DELETE FROM fornecedor WHERE id_fornecedor = ?",
+        [id],
+        function (this: sqlite3.RunResult, err: Error | null) {
+          if (err) reject(err);
+          else resolve(this.changes > 0);
+        },
+      );
+    });
+  },
 };
