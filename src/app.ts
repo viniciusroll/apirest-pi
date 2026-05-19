@@ -11,6 +11,7 @@
 
 import express, { Request, Response, NextFunction } from "express";
 import produtoRoutes from "./routes/produto.routes";
+import fornecedorRoutes from "./routes/fornecedor.routes";
 import { ZodError } from "zod";
 import { AppError } from "./errors/app-error";
 
@@ -22,11 +23,12 @@ app.use(express.json());
 // --------------------------------------------------------------------------
 // Rotas
 // --------------------------------------------------------------------------
-// Por enquanto so registramos /produtos. Outras rotas (clientes, pedidos,
-// usuario, fornecedor, relatorios) entrarao quando seus modulos ficarem
+// Ja registramos /produtos e /fornecedores. As demais rotas (clientes,
+// pedidos, usuario, relatorios) entrarao quando seus modulos ficarem
 // prontos.
 // --------------------------------------------------------------------------
 app.use("/produtos", produtoRoutes);
+app.use("/fornecedores", fornecedorRoutes);
 
 // --------------------------------------------------------------------------
 // Middleware central de erros
