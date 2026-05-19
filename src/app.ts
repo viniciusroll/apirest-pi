@@ -1,19 +1,14 @@
 // ============================================================================
-// app.ts — setup do Express (versao MINIMA, provisoria)
+// app.ts — setup do Express
 // ============================================================================
-// ATENCAO: este arquivo e' uma versao MINIMA criada pra permitir testar
-// as rotas do modulo Produto via Postman/Insomnia.
-//
-// A versao final (com todas as rotas, middleware de validacao centralizada,
-// CORS, autenticacao, etc.) sera feita pela Pessoa 2 — Nucleo da Aplicacao.
-// Quando ela mexer, este arquivo vai ser SOBRESCRITO.
+// Todas as rotas sao agregadas em src/routes/index.ts.
+// O middleware central de erros (ZodError -> 400, AppError -> statusCode,
+// resto -> 500) fica em src/middleware/error.middleware.ts.
 // ============================================================================
 
-import express, { Request, Response, NextFunction } from "express";
-import produtoRoutes from "./routes/produto.routes";
-import fornecedorRoutes from "./routes/fornecedor.routes";
-import { ZodError } from "zod";
-import { AppError } from "./errors/app-error";
+import express from "express";
+import routes from "./routes";
+import { errorHandler } from "./middleware/error.middleware";
 
 const app = express();
 
@@ -23,36 +18,11 @@ app.use(express.json());
 // --------------------------------------------------------------------------
 // Rotas
 // --------------------------------------------------------------------------
-// Ja registramos /produtos e /fornecedores. As demais rotas (clientes,
-// pedidos, usuario, relatorios) entrarao quando seus modulos ficarem
-// prontos.
-// --------------------------------------------------------------------------
-app.use("/produtos", produtoRoutes);
-app.use("/fornecedores", fornecedorRoutes);
+app.use(routes);
 
 // --------------------------------------------------------------------------
 // Middleware central de erros
 // --------------------------------------------------------------------------
-// Toda funcao do controller usa next(err) — esse middleware captura.
-// Tipa cada tipo de erro e devolve resposta JSON apropriada.
-// --------------------------------------------------------------------------
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  // Erro de validacao Zod -> 400 com detalhes dos campos invalidos
-  if (err instanceof ZodError) {
-    return res.status(400).json({
-      erro: "Dados invalidos",
-      detalhes: err.flatten().fieldErrors,
-    });
-  }
-
-  // Erro de dominio (lancado pelo service via AppError)
-  if (err instanceof AppError) {
-    return res.status(err.statusCode).json({ erro: err.message });
-  }
-
-  // Qualquer outro erro -> 500 (esconde detalhes do cliente)
-  console.error("Erro nao tratado:", err);
-  return res.status(500).json({ erro: "Erro interno do servidor" });
-});
+app.use(errorHandler);
 
 export default app;

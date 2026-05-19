@@ -100,3 +100,14 @@ export const fornecedorController = {
     }
   },
 };
+
+// ----------------------------------------------------------------------------
+// Exports nomeados (aliases) — usados por src/routes/fornecedor.route.ts,
+// que importa via `import * as controller` e chama controller.criarFornecedor
+// etc. Mantem retrocompatibilidade com o objeto fornecedorController acima.
+// ----------------------------------------------------------------------------
+export const criarFornecedor = fornecedorController.criar;
+export const listarFornecedores = fornecedorController.listar;
+export const buscarFornecedorPorID = fornecedorController.buscarPorId;
+export const atualizarFornecedor = fornecedorController.atualizar;
+export const excluirFornecedor = fornecedorController.remover;

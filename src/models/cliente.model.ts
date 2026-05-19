@@ -4,6 +4,7 @@ export interface Cliente {
   cpf: string;
   endereco: string | null;
   criado_em: string;
+  atualizado_em: string;
 }
 
 export interface EmailCliente {
@@ -23,5 +24,5 @@ export interface ClienteCompleto extends Cliente {
   telefones: string[];
 }
 
-export type EntradaCriarCliente = Omit<Cliente, "id_cliente" | "criado_em">;
+export type EntradaCriarCliente = Omit<Cliente, "id_cliente" | "criado_em" | "atualizado_em">;
 export type EntradaAtualizarCliente = Partial<EntradaCriarCliente>;
