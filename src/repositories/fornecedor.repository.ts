@@ -25,8 +25,13 @@
 // placeholders fazem o driver escapar os valores automaticamente.
 // ============================================================================
 
+import sqlite3 from "sqlite3";
 import { db } from "../config/database";
-import { Fornecedor, FornecedorCompleto } from "../models/fornecedor.model";
+import {
+  Fornecedor,
+  FornecedorCompleto,
+  EntradaCriarFornecedor,
+} from "../models/fornecedor.model";
 
 // ----------------------------------------------------------------------------
 // Helpers internos (nao exportados) — buscam os atributos multivalorados
@@ -55,6 +60,40 @@ function buscarTelefones(idFornecedor: number): Promise<string[]> {
         else resolve(rows.map((r) => r.telefone));
       },
     );
+  });
+}
+
+// ----------------------------------------------------------------------------
+// Helpers de escrita usados pelo create (e mais tarde pelo update).
+// Como o INSERT do fornecedor + N emails + N telefones precisa ser ATOMICO
+// (ou grava tudo, ou nada), envolvemos numa transacao manual:
+//
+//   BEGIN -> inserts -> COMMIT     (deu tudo certo)
+//   BEGIN -> erro    -> ROLLBACK   (desfaz o que ja tinha inserido)
+//
+// 'executar' roda um comando sem retorno. 'inserirEObterId' roda um INSERT
+// e devolve o id gerado (this.lastID — por isso a function tradicional com
+// 'this' tipado, igual ao produto.repository).
+//
+// Observacao: a transacao usa a conexao global. Para o volume de uma loja
+// (um operador por vez) isso e' suficiente — mesma simplificacao adotada
+// no resto do projeto.
+// ----------------------------------------------------------------------------
+function executar(sql: string, params: unknown[] = []): Promise<void> {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, (err: Error | null) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+}
+
+function inserirEObterId(sql: string, params: unknown[]): Promise<number> {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function (this: sqlite3.RunResult, err: Error | null) {
+      if (err) reject(err);
+      else resolve(this.lastID);
+    });
   });
 }
 
@@ -151,5 +190,50 @@ export const fornecedorRepository = {
     ]);
 
     return { ...fornecedor, emails, telefones };
+  },
+
+  // --------------------------------------------------------------------------
+  // Cria um fornecedor + seus emails + seus telefones, de forma ATOMICA.
+  // --------------------------------------------------------------------------
+  // Se qualquer insert falhar (ex.: cnpj duplicado viola o UNIQUE, ou um
+  // email repetido viola UNIQUE(id_fornecedor,email)), o ROLLBACK desfaz
+  // tudo — nunca fica um fornecedor "pela metade".
+  //
+  // Devolve o registro completo recem-criado (reaproveitando findById).
+  // --------------------------------------------------------------------------
+  async create(input: EntradaCriarFornecedor): Promise<FornecedorCompleto> {
+    const { nome, cnpj, endereco, tempo_entrega, emails, telefones } = input;
+
+    await executar("BEGIN TRANSACTION");
+    try {
+      const idFornecedor = await inserirEObterId(
+        `INSERT INTO fornecedor (nome, cnpj, endereco, tempo_entrega)
+         VALUES (?, ?, ?, ?)`,
+        [nome, cnpj, endereco ?? null, tempo_entrega ?? null],
+      );
+
+      for (const email of emails) {
+        await executar(
+          "INSERT INTO email_fornecedor (id_fornecedor, email) VALUES (?, ?)",
+          [idFornecedor, email],
+        );
+      }
+
+      for (const telefone of telefones) {
+        await executar(
+          "INSERT INTO telefone_fornecedor (id_fornecedor, telefone) VALUES (?, ?)",
+          [idFornecedor, telefone],
+        );
+      }
+
+      await executar("COMMIT");
+
+      // findById nao devolve null aqui (acabamos de inserir) — o '!' so
+      // tranquiliza o TypeScript.
+      return (await fornecedorRepository.findById(idFornecedor))!;
+    } catch (err) {
+      await executar("ROLLBACK");
+      throw err;
+    }
   },
 };
