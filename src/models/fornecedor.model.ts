@@ -24,5 +24,16 @@ export interface FornecedorCompleto extends Fornecedor {
   telefones: string[];
 }
 
-export type EntradaCriarFornecedor = Omit<Fornecedor, "id_fornecedor" | "criado_em">;
+// Entrada de criacao: dados do fornecedor + os contatos multivalorados.
+// emails/telefones nao ficam na tabela 'fornecedor' (vao para
+// email_fornecedor / telefone_fornecedor), mas chegam juntos no body
+// da request, entao fazem parte do input do service/repository.
+export type EntradaCriarFornecedor = Omit<
+  Fornecedor,
+  "id_fornecedor" | "criado_em"
+> & {
+  emails: string[];
+  telefones: string[];
+};
+
 export type EntradaAtualizarFornecedor = Partial<EntradaCriarFornecedor>;
