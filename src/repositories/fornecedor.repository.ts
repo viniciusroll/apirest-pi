@@ -31,6 +31,7 @@ import {
   Fornecedor,
   FornecedorCompleto,
   EntradaCriarFornecedor,
+  EntradaAtualizarFornecedor,
 } from "../models/fornecedor.model";
 
 // ----------------------------------------------------------------------------
@@ -231,6 +232,95 @@ export const fornecedorRepository = {
       // findById nao devolve null aqui (acabamos de inserir) — o '!' so
       // tranquiliza o TypeScript.
       return (await fornecedorRepository.findById(idFornecedor))!;
+    } catch (err) {
+      await executar("ROLLBACK");
+      throw err;
+    }
+  },
+
+  // --------------------------------------------------------------------------
+  // Atualiza um fornecedor. Aceita atualizacao PARCIAL (so o que veio).
+  // --------------------------------------------------------------------------
+  // Estrategia:
+  //   1. Monta dinamicamente "campo = ?" so para os campos da TABELA
+  //      fornecedor que vieram no input (igual ao produto.repository).
+  //   2. emails/telefones sao multivalorados — a forma mais simples e
+  //      previsivel de "atualizar" e SUBSTITUIR a lista inteira: apaga as
+  //      antigas e insere as novas. So mexe se o campo veio no input.
+  //   3. Tudo dentro de uma transacao (mexe em ate 3 tabelas).
+  //
+  // O service garante que o id existe (lanca 404 antes de chamar) — mesma
+  // divisao de responsabilidade do modulo Produto.
+  // --------------------------------------------------------------------------
+  async update(
+    id: number,
+    input: EntradaAtualizarFornecedor,
+  ): Promise<FornecedorCompleto | null> {
+    const fields: string[] = [];
+    const values: unknown[] = [];
+
+    if (input.nome !== undefined) {
+      fields.push("nome = ?");
+      values.push(input.nome);
+    }
+    if (input.cnpj !== undefined) {
+      fields.push("cnpj = ?");
+      values.push(input.cnpj);
+    }
+    if (input.endereco !== undefined) {
+      fields.push("endereco = ?");
+      values.push(input.endereco);
+    }
+    if (input.tempo_entrega !== undefined) {
+      fields.push("tempo_entrega = ?");
+      values.push(input.tempo_entrega);
+    }
+
+    const mexeEmContatos =
+      input.emails !== undefined || input.telefones !== undefined;
+
+    // Nada para atualizar (nem campos, nem contatos) — devolve o atual
+    if (fields.length === 0 && !mexeEmContatos) {
+      return fornecedorRepository.findById(id);
+    }
+
+    await executar("BEGIN TRANSACTION");
+    try {
+      if (fields.length > 0) {
+        await executar(
+          `UPDATE fornecedor SET ${fields.join(", ")} WHERE id_fornecedor = ?`,
+          [...values, id],
+        );
+      }
+
+      if (input.emails !== undefined) {
+        await executar(
+          "DELETE FROM email_fornecedor WHERE id_fornecedor = ?",
+          [id],
+        );
+        for (const email of input.emails) {
+          await executar(
+            "INSERT INTO email_fornecedor (id_fornecedor, email) VALUES (?, ?)",
+            [id, email],
+          );
+        }
+      }
+
+      if (input.telefones !== undefined) {
+        await executar(
+          "DELETE FROM telefone_fornecedor WHERE id_fornecedor = ?",
+          [id],
+        );
+        for (const telefone of input.telefones) {
+          await executar(
+            "INSERT INTO telefone_fornecedor (id_fornecedor, telefone) VALUES (?, ?)",
+            [id, telefone],
+          );
+        }
+      }
+
+      await executar("COMMIT");
+      return fornecedorRepository.findById(id);
     } catch (err) {
       await executar("ROLLBACK");
       throw err;
