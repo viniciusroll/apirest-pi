@@ -94,7 +94,7 @@ export const fornecedorController = {
     try {
       const id = Number(req.params.id);
       await fornecedorService.remover(id);
-      res.status(204).send();
+      res.status(204).send(`Fornecedor ${id} deletado com sucesso!`);
     } catch (err) {
       next(err);
     }
