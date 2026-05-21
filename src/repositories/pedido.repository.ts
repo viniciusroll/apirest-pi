@@ -13,7 +13,7 @@ createPedido(
 ): Promise<PedidoComItens> {
   return new Promise((resolve, reject) => {
     db.run(
-      `INSERT INTO pedido (id_cliente, id_usuario, forma_pagamento, status, total_pedido, criado_em, atualizado_em)
+      `INSERT INTO pedido (id_cliente, id_usuario, forma_pagamento, status, total, criado_em, atualizado_em)
        VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
       [id_cliente, id_usuario, forma_pagamento, status, total],
       function (this: sqlite3.RunResult, err: Error | null) {
