@@ -4,7 +4,7 @@ import { EntradaCriarPedido, PedidoComItens, StatusPedido } from "../models/pedi
 import { AppError } from "../errors/app-error";
 
 export async function criarPedido(dados: EntradaCriarPedido): Promise<PedidoComItens> {
-  let total = 0;
+  let total_pedido = 0;
   const itensProcessados: { id_produto: number; quantidade: number; preco_unitario: number }[] = [];
 
   for (const item of dados.itens) {
@@ -17,7 +17,7 @@ export async function criarPedido(dados: EntradaCriarPedido): Promise<PedidoComI
 
     const precoUnitario = produto.preco; // 🔹 congela preço no momento da venda
     const subtotal = precoUnitario * item.quantidade;
-    total += subtotal;
+    total_pedido += subtotal;
 
     itensProcessados.push({ ...item, preco_unitario: precoUnitario });
 
@@ -33,7 +33,7 @@ export async function criarPedido(dados: EntradaCriarPedido): Promise<PedidoComI
     dados.forma_pagamento,
     dados.status ?? "PENDENTE",
     itensProcessados,
-    total
+    total_pedido
   );
 }
 
