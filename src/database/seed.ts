@@ -120,7 +120,7 @@ async function seedDatabase() {
       data_pedido     DATETIME DEFAULT CURRENT_TIMESTAMP,
       status          VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
       forma_pagamento VARCHAR(50),
-      total           REAL NOT NULL DEFAULT 0,
+      total_pedido           REAL NOT NULL DEFAULT 0,
       criado_em       DATETIME DEFAULT CURRENT_TIMESTAMP,
       atualizado_em   DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente),
