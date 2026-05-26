@@ -117,7 +117,6 @@ async function seedDatabase() {
       id_pedido       INTEGER PRIMARY KEY AUTOINCREMENT,
       id_cliente      INTEGER NOT NULL,
       id_usuario      INTEGER NOT NULL,
-      data_pedido     DATETIME DEFAULT CURRENT_TIMESTAMP,
       status          VARCHAR(20) NOT NULL DEFAULT 'PENDENTE',
       forma_pagamento VARCHAR(50),
       total_pedido           REAL NOT NULL DEFAULT 0,
