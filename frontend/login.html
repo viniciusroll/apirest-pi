@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Bebidas — Entrar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 40px 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .header svg {
+            width: 32px;
+            height: 32px;
+            color: #2563EB;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .icon-left {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1e293b;
+            background: #ffffff;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .input-wrapper.has-toggle input {
+            padding-right: 40px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-password:hover {
+            color: #475569;
+        }
+
+        .toggle-password svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .options-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #475569;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #2563EB;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: #2563EB;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn-entrar {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563EB;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+
+        .btn-entrar:hover:not(:disabled) {
+            background-color: #1d4ed8;
+        }
+
+        .btn-entrar:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 16px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+
+        .message.error {
+            display: block;
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .message.success {
+            display: block;
+            background-color: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .signup-link a {
+            color: #2563EB;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Sistema de Gestão</h1>
+            </div>
+
+            <p class="subtitle">Entrar</p>
+
+            <form id="loginForm" novalidate>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-wrapper">
+                        <svg class="icon-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <input type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <div class="input-wrapper has-toggle">
+                        <svg class="icon-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar senha">
+                            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="options-row">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="lembrar">
+                        <span>Lembrar meu acesso</span>
+                    </label>
+                    <a href="#" class="forgot-link">Esqueci minha senha</a>
+                </div>
+
+                <button type="submit" class="btn-entrar" id="btnEntrar">Entrar</button>
+
+                <div class="message" id="message"></div>
+            </form>
+        </div>
+
+        <p class="signup-link">
+            Não tem conta? <a href="#">Cadastre-se</a>
+        </p>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const senhaInput = document.getElementById('senha');
+        const lembrarCheckbox = document.getElementById('lembrar');
+        const btnEntrar = document.getElementById('btnEntrar');
+        const message = document.getElementById('message');
+        const togglePassword = document.getElementById('togglePassword');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        const eyeOpenSVG = `
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+        `;
+        const eyeClosedSVG = `
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+        `;
+
+        // Preenche email salvo se "Lembrar meu acesso" foi marcado anteriormente
+        window.addEventListener('DOMContentLoaded', () => {
+            const emailSalvo = localStorage.getItem('email_lembrado');
+            if (emailSalvo) {
+                emailInput.value = emailSalvo;
+                lembrarCheckbox.checked = true;
+            }
+        });
+
+        // Toggle mostrar/ocultar senha
+        togglePassword.addEventListener('click', () => {
+            const isPassword = senhaInput.type === 'password';
+            senhaInput.type = isPassword ? 'text' : 'password';
+            eyeIcon.innerHTML = isPassword ? eyeClosedSVG : eyeOpenSVG;
+            togglePassword.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
+        });
+
+        function mostrarMensagem(texto, tipo) {
+            message.textContent = texto;
+            message.className = `message ${tipo}`;
+        }
+
+        function limparMensagem() {
+            message.textContent = '';
+            message.className = 'message';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            limparMensagem();
+
+            const email = emailInput.value.trim();
+            const senha = senhaInput.value;
+
+            if (!email || !senha) {
+                mostrarMensagem('Preencha email e senha.', 'error');
+                return;
+            }
+
+            btnEntrar.disabled = true;
+            btnEntrar.textContent = 'Entrando...';
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    const erro = data.erro || 'Email ou senha inválidos.';
+                    mostrarMensagem(erro, 'error');
+                    return;
+                }
+
+                if (!data.token) {
+                    mostrarMensagem('Resposta inválida do servidor.', 'error');
+                    return;
+                }
+
+                localStorage.setItem('token', data.token);
+
+                if (lembrarCheckbox.checked) {
+                    localStorage.setItem('email_lembrado', email);
+                } else {
+                    localStorage.removeItem('email_lembrado');
+                }
+
+                mostrarMensagem('Login realizado! Redirecionando...', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 600);
+            } catch (err) {
+                mostrarMensagem('Não foi possível conectar à API', 'error');
+            } finally {
+                btnEntrar.disabled = false;
+                btnEntrar.textContent = 'Entrar';
+            }
+        });
+    </script>
+</body>
+</html>

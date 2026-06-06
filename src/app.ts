@@ -15,6 +15,18 @@ const app = express();
 // Habilita parse de JSON no body das requests
 app.use(express.json());
 
+// Habilita CORS para qualquer origem (desenvolvimento)
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+    return;
+  }
+  next();
+});
+
 // --------------------------------------------------------------------------
 // Rotas
 // --------------------------------------------------------------------------
