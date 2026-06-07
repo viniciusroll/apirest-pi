@@ -52,13 +52,29 @@ function toast(msg, tipo = 'success') {
   setTimeout(() => t.remove(), 3200);
 }
 
+function pad2(value) {
+  return String(value).padStart(2, '0');
+}
+
 function formatDate(str) {
   if (!str) return '-';
-  const d = (str + '').split('T')[0];
-  if (!d || d === 'undefined') return '-';
-  const parts = d.split('-');
-  if (parts.length !== 3) return str;
-  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  const value = String(str).trim();
+  const date = new Date(value);
+  if (!Number.isNaN(date.getTime())) {
+    return `${pad2(date.getDate())}/${pad2(date.getMonth() + 1)}/${date.getFullYear()} ${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`;
+  }
+
+  const match = value.match(/^([0-9]{4})-([0-9]{2})-([0-9]{2})(?:[ T]([0-9]{2}):([0-9]{2}):([0-9]{2}))?/);
+  if (match) {
+    const [, year, month, day, hours, minutes, seconds] = match;
+    let formatted = `${day}/${month}/${year}`;
+    if (hours !== undefined) {
+      formatted += ` ${hours}:${minutes}:${seconds}`;
+    }
+    return formatted;
+  }
+
+  return value;
 }
 
 function formatMoney(n) {

@@ -114,9 +114,31 @@
     });
 
     function filtrarTabela(q) {
+      const cleaned = q.trim();
       const rows = document.querySelectorAll('#tbodyClientes tr');
-      q = q.toLowerCase();
-      rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+      if (!cleaned) {
+        rows.forEach(r => { r.style.display = ''; });
+        return;
+      }
+
+      const numericOnly = /^[0-9]+$/.test(cleaned);
+      rows.forEach(r => {
+        const id = r.dataset.idCliente || '';
+        const cpf = r.dataset.cpf || '';
+        const nome = r.cells[1]?.textContent?.toLowerCase() || '';
+        const endereco = r.cells[3]?.textContent?.toLowerCase() || '';
+        const emails = r.cells[4]?.textContent?.toLowerCase() || '';
+        const telefones = r.cells[5]?.textContent?.toLowerCase() || '';
+
+        let visible;
+        if (numericOnly) {
+          visible = cleaned.length === 11 ? cpf === cleaned : id === cleaned;
+        } else {
+          visible = [nome, endereco, emails, telefones].some(field => field.includes(cleaned.toLowerCase()));
+        }
+
+        r.style.display = visible ? '' : 'none';
+      });
     }
 
     async function carregar() {
@@ -133,7 +155,7 @@
         return;
       }
       tbody.innerHTML = lista.map(c => `
-        <tr>
+        <tr data-id-cliente="${c.id_cliente}" data-cpf="${escHtml(c.cpf)}">
           <td>${c.id_cliente}</td>
           <td>${escHtml(c.nome)}</td>
           <td>${escHtml(formatCpf(c.cpf))}</td>

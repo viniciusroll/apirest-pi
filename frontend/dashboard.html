@@ -55,10 +55,27 @@
     });
 
     function filtrarTabela(q) {
+      const cleaned = q.trim();
       const rows = document.querySelectorAll('#tbodyPedidos tr');
-      q = q.toLowerCase();
+      if (!cleaned) {
+        rows.forEach(r => { r.style.display = ''; });
+        return;
+      }
+
+      const numericOnly = /^[0-9]+$/.test(cleaned);
       rows.forEach(r => {
-        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+        const id = r.cells[0]?.textContent?.replace('#', '').trim() || '';
+        const cliente = r.cells[1]?.textContent?.toLowerCase() || '';
+        const pagamento = r.cells[2]?.textContent?.toLowerCase() || '';
+        const status = r.cells[3]?.textContent?.toLowerCase() || '';
+        const total = r.cells[4]?.textContent?.toLowerCase() || '';
+        const data = r.cells[5]?.textContent?.toLowerCase() || '';
+
+        const visible = numericOnly
+          ? id === cleaned
+          : [cliente, pagamento, status, total, data].some(field => field.includes(cleaned.toLowerCase()));
+
+        r.style.display = visible ? '' : 'none';
       });
     }
 
