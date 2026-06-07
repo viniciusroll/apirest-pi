@@ -3,6 +3,10 @@ import { produtoRepository } from "../repositories/produto.repository";
 import { EntradaCriarPedido, PedidoComItens, StatusPedido } from "../models/pedido.model";
 import { AppError } from "../errors/app-error";
 
+export async function listar() {
+  return pedidoRepository.findAll();
+}
+
 export async function criarPedido(dados: EntradaCriarPedido): Promise<PedidoComItens> {
   let total_pedido = 0;
   const itensProcessados: { id_produto: number; quantidade: number; preco_unitario: number }[] = [];

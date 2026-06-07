@@ -22,18 +22,27 @@ API REST em **TypeScript + Node.js + Express** para gerenciar clientes, forneced
 
 ## Como executar
 
+### Inicialização rápida (recomendado)
+
 ```bash
 # 1. Instalar dependências
 npm install
 
 # 2. Copiar .env de exemplo
-cp .env.example .env
+copy .env.example .env
 
-# 3. Inicializar o banco SQLite (cria database.db na raiz)
-npm run db:init
+# 3. Iniciar tudo de uma vez (banco + seed + API + navegador)
+npm run start:all
+```
 
-# 4. Rodar em modo desenvolvimento (hot reload via tsx)
-npm run dev
+> O script `start:all` inicializa o banco, popula com dados de exemplo, sobe o servidor e abre automaticamente `http://localhost:3000/login.html` no navegador.
+
+### Execução manual (passo a passo)
+
+```bash
+npm run db:init   # Cria o banco de dados
+npm run db:seed   # Popula com dados de exemplo
+npm run dev       # Inicia o servidor (hot reload)
 ```
 
 Servidor em http://localhost:3000
@@ -42,6 +51,7 @@ Servidor em http://localhost:3000
 
 | Script | O que faz |
 |---|---|
+| `npm run start:all` | **Inicialização completa**: banco + seed + API + abre navegador |
 | `npm run dev` | Sobe o servidor com `tsx watch src/server.ts` |
 | `npm run build` | Compila TypeScript para `dist/` |
 | `npm start` | Roda a build (`node dist/server.js`) |

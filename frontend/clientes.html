@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes — Sistema de Gestao</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main">
+    <div id="topbar-placeholder"></div>
+
+    <div class="page-content">
+      <div class="page-header">
+        <h1 class="page-title">Clientes</h1>
+        <button class="btn btn-primary" onclick="abrirModalNovo()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Cliente
+        </button>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>CPF</th>
+              <th>Endereco</th>
+              <th>Emails</th>
+              <th>Telefones</th>
+              <th>Cadastro</th>
+              <th>Acoes</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyClientes">
+            <tr class="loading-row"><td colspan="8">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal criar/editar -->
+  <div class="modal-backdrop hidden" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="modalTitle">Novo Cliente</span>
+        <button class="modal-close" onclick="fecharModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" id="fNome" placeholder="Nome completo">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>CPF (somente numeros)</label>
+          <input type="text" id="fCpf" placeholder="00000000000" maxlength="11">
+        </div>
+        <div class="form-group">
+          <label>Endereco</label>
+          <input type="text" id="fEndereco" placeholder="Rua, numero, bairro">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Emails</label>
+        <div class="multi-value-list" id="emailsList"></div>
+        <button type="button" class="btn-add-row" onclick="addEmailRow()">+ Adicionar email</button>
+      </div>
+
+      <div class="form-group">
+        <label>Telefones (somente numeros, 10 ou 11 digitos)</label>
+        <div class="multi-value-list" id="telefonesList"></div>
+        <button type="button" class="btn-add-row" onclick="addTelefoneRow()">+ Adicionar telefone</button>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+        <button class="btn btn-primary" id="btnSalvar" onclick="salvar()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal confirmacao delete -->
+  <div class="modal-backdrop hidden" id="confirmBackdrop">
+    <div class="confirm-dialog">
+      <h3>Excluir cliente</h3>
+      <p>Tem certeza que deseja excluir este cliente? Esta acao nao pode ser desfeita.</p>
+      <div class="confirm-dialog-footer">
+        <button class="btn btn-secondary" onclick="fecharConfirm()">Cancelar</button>
+        <button class="btn btn-danger" id="btnConfirmDelete" onclick="confirmarDelete()">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let clientes = [];
+    let editandoId = null;
+    let deletandoId = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!authGuard()) return;
+      document.getElementById('sidebar-placeholder').innerHTML = sidebarHTML('clientes.html');
+      document.getElementById('topbar-placeholder').innerHTML = topbarHTML();
+      initTopbar();
+      await carregar();
+    });
+
+    function filtrarTabela(q) {
+      const rows = document.querySelectorAll('#tbodyClientes tr');
+      q = q.toLowerCase();
+      rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+    }
+
+    async function carregar() {
+      try {
+        clientes = await api('/clientes');
+        renderTabela(clientes);
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    function renderTabela(lista) {
+      const tbody = document.getElementById('tbodyClientes');
+      if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#94a3b8">Nenhum cliente cadastrado</td></tr>';
+        return;
+      }
+      tbody.innerHTML = lista.map(c => `
+        <tr>
+          <td>${c.id_cliente}</td>
+          <td>${escHtml(c.nome)}</td>
+          <td>${escHtml(formatCpf(c.cpf))}</td>
+          <td>${escHtml(c.endereco || '-')}</td>
+          <td>${escHtml((c.emails || []).join(', ') || '-')}</td>
+          <td>${escHtml((c.telefones || []).join(', ') || '-')}</td>
+          <td>${formatDate(c.criado_em)}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-icon btn-icon-edit" onclick="abrirModalEditar(${c.id_cliente})" title="Editar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="btn-icon btn-icon-delete" onclick="abrirConfirmDelete(${c.id_cliente})" title="Excluir">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function formatCpf(cpf) {
+      if (!cpf || cpf.length !== 11) return cpf;
+      return `${cpf.slice(0,3)}.${cpf.slice(3,6)}.${cpf.slice(6,9)}-${cpf.slice(9)}`;
+    }
+
+    function abrirModalNovo() {
+      editandoId = null;
+      document.getElementById('modalTitle').textContent = 'Novo Cliente';
+      document.getElementById('fNome').value = '';
+      document.getElementById('fCpf').value = '';
+      document.getElementById('fEndereco').value = '';
+      document.getElementById('emailsList').innerHTML = '';
+      document.getElementById('telefonesList').innerHTML = '';
+      addEmailRow();
+      addTelefoneRow();
+      document.getElementById('modalBackdrop').classList.remove('hidden');
+    }
+
+    function abrirModalEditar(id) {
+      const c = clientes.find(x => x.id_cliente === id);
+      if (!c) return;
+      editandoId = id;
+      document.getElementById('modalTitle').textContent = 'Editar Cliente';
+      document.getElementById('fNome').value = c.nome || '';
+      document.getElementById('fCpf').value = c.cpf || '';
+      document.getElementById('fEndereco').value = c.endereco || '';
+
+      document.getElementById('emailsList').innerHTML = '';
+      (c.emails || ['']).forEach(e => addEmailRow(e));
+      if (!(c.emails || []).length) addEmailRow();
+
+      document.getElementById('telefonesList').innerHTML = '';
+      (c.telefones || ['']).forEach(t => addTelefoneRow(t));
+      if (!(c.telefones || []).length) addTelefoneRow();
+
+      document.getElementById('modalBackdrop').classList.remove('hidden');
+    }
+
+    function fecharModal() { document.getElementById('modalBackdrop').classList.add('hidden'); }
+
+    function addEmailRow(val = '') {
+      const list = document.getElementById('emailsList');
+      const row = document.createElement('div');
+      row.className = 'multi-value-row';
+      row.innerHTML = `<input type="email" placeholder="email@exemplo.com" value="${escHtml(val)}">
+        <button type="button" class="btn-icon btn-icon-delete" onclick="this.parentElement.remove()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>`;
+      list.appendChild(row);
+    }
+
+    function addTelefoneRow(val = '') {
+      const list = document.getElementById('telefonesList');
+      const row = document.createElement('div');
+      row.className = 'multi-value-row';
+      row.innerHTML = `<input type="text" placeholder="11999999999" maxlength="11" value="${escHtml(val)}">
+        <button type="button" class="btn-icon btn-icon-delete" onclick="this.parentElement.remove()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>`;
+      list.appendChild(row);
+    }
+
+    async function salvar() {
+      const nome = document.getElementById('fNome').value.trim();
+      const cpf = document.getElementById('fCpf').value.trim().replace(/\D/g,'');
+      const endereco = document.getElementById('fEndereco').value.trim();
+      const emails = [...document.querySelectorAll('#emailsList input')].map(i => i.value.trim()).filter(Boolean);
+      const telefones = [...document.querySelectorAll('#telefonesList input')].map(i => i.value.trim().replace(/\D/g,'')).filter(Boolean);
+
+      if (!nome || !cpf || !endereco || !emails.length || !telefones.length) {
+        toast('Preencha todos os campos obrigatorios', 'error'); return;
+      }
+
+      const btn = document.getElementById('btnSalvar');
+      btn.disabled = true;
+      try {
+        const body = { nome, cpf, endereco, emails, telefones };
+        if (editandoId) {
+          await api(`/clientes/${editandoId}`, { method: 'PUT', body: JSON.stringify(body) });
+          toast('Cliente atualizado com sucesso');
+        } else {
+          await api('/clientes', { method: 'POST', body: JSON.stringify(body) });
+          toast('Cliente cadastrado com sucesso');
+        }
+        fecharModal();
+        await carregar();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function abrirConfirmDelete(id) {
+      deletandoId = id;
+      document.getElementById('confirmBackdrop').classList.remove('hidden');
+    }
+    function fecharConfirm() { document.getElementById('confirmBackdrop').classList.add('hidden'); }
+
+    async function confirmarDelete() {
+      const btn = document.getElementById('btnConfirmDelete');
+      btn.disabled = true;
+      try {
+        await api(`/clientes/${deletandoId}`, { method: 'DELETE' });
+        toast('Cliente excluido');
+        fecharConfirm();
+        await carregar();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

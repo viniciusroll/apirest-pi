@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio — Sistema de Gestao</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main">
+    <div id="topbar-placeholder"></div>
+
+    <div class="page-content">
+      <div class="page-header">
+        <h1 class="page-title">Inicio</h1>
+      </div>
+
+      <div class="summary-cards" id="summaryCards">
+        <div class="summary-card"><div class="s-label">Clientes</div><div class="s-value" id="totalClientes">-</div></div>
+        <div class="summary-card"><div class="s-label">Produtos</div><div class="s-value" id="totalProdutos">-</div></div>
+        <div class="summary-card"><div class="s-label">Pedidos</div><div class="s-value" id="totalPedidos">-</div></div>
+        <div class="summary-card"><div class="s-label">Fornecedores</div><div class="s-value" id="totalFornecedores">-</div></div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Forma de Pagamento</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyPedidos">
+            <tr class="loading-row"><td colspan="6">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!authGuard()) return;
+      document.getElementById('sidebar-placeholder').innerHTML = sidebarHTML('dashboard.html');
+      document.getElementById('topbar-placeholder').innerHTML = topbarHTML();
+      initTopbar();
+      await carregarDashboard();
+    });
+
+    function filtrarTabela(q) {
+      const rows = document.querySelectorAll('#tbodyPedidos tr');
+      q = q.toLowerCase();
+      rows.forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    const statusBadge = {
+      PENDENTE: 'badge-yellow',
+      PAGO: 'badge-green',
+      CANCELADO: 'badge-red',
+    };
+
+    async function carregarDashboard() {
+      try {
+        const [clientes, produtos, pedidos, fornecedores] = await Promise.all([
+          api('/clientes'),
+          api('/produtos'),
+          api('/pedidos'),
+          api('/fornecedores'),
+        ]);
+
+        document.getElementById('totalClientes').textContent = clientes.length;
+        document.getElementById('totalProdutos').textContent = produtos.length;
+        document.getElementById('totalPedidos').textContent = pedidos.length;
+        document.getElementById('totalFornecedores').textContent = fornecedores.length;
+
+        const tbody = document.getElementById('tbodyPedidos');
+        if (!pedidos.length) {
+          tbody.innerHTML = '<tr><td colspan="6" class="loading-row" style="text-align:center;padding:32px;color:#94a3b8">Nenhum pedido registrado</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = pedidos.slice(0, 20).map(p => `
+          <tr>
+            <td>#${p.id_pedido}</td>
+            <td>${escHtml(p.nome_cliente || '-')}</td>
+            <td>${escHtml(p.forma_pagamento)}</td>
+            <td><span class="badge ${statusBadge[p.status] || 'badge-gray'}">${p.status}</span></td>
+            <td>${formatMoney(p.total_pedido)}</td>
+            <td>${formatDate(p.criado_em)}</td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

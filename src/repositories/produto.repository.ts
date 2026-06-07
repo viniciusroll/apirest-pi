@@ -29,7 +29,10 @@ export const produtoRepository = {
   findAll(): Promise<Produto[]> {
     return new Promise((resolve, reject) => {
       db.all(
-        "SELECT * FROM produto ORDER BY id_produto",
+        `SELECT p.*, f.nome AS nome_fornecedor
+         FROM produto p
+         LEFT JOIN fornecedor f ON f.id_fornecedor = p.id_fornecedor
+         ORDER BY p.id_produto`,
         (err: Error | null, rows: Produto[]) => {
           if (err) reject(err);
           else resolve(rows);

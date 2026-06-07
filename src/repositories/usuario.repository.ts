@@ -41,4 +41,14 @@ export const usuarioRepository = {
       );
     });
   },
+
+  updateSenha(id: number, senha_hash: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      db.run(
+        "UPDATE usuario SET senha_hash = ?, atualizado_em = CURRENT_TIMESTAMP WHERE id_usuario = ?",
+        [senha_hash, id],
+        (err: Error | null) => { if (err) reject(err); else resolve(); }
+      );
+    });
+  },
 };

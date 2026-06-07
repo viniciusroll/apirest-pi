@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produtos — Sistema de Gestao</title>
+  <link rel="stylesheet" href="shared.css">
+</head>
+<body>
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main">
+    <div id="topbar-placeholder"></div>
+
+    <div class="page-content">
+      <div class="page-header">
+        <h1 class="page-title">Produtos</h1>
+        <button class="btn btn-primary" onclick="abrirModalNovo()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Produto
+        </button>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>Categoria</th>
+              <th>Preco</th>
+              <th>Estoque</th>
+              <th>Validade</th>
+              <th>Fornecedor</th>
+              <th>Acoes</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyProdutos">
+            <tr class="loading-row"><td colspan="8">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-backdrop hidden" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="modalTitle">Novo Produto</span>
+        <button class="modal-close" onclick="fecharModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" id="fNome" placeholder="Nome do produto">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Preco (R$)</label>
+          <input type="number" id="fPreco" placeholder="0.00" min="0.01" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Estoque</label>
+          <input type="number" id="fEstoque" placeholder="0" min="0" step="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Categoria</label>
+          <select id="fCategoria">
+            <option value="">Selecione...</option>
+            <option>CERVEJA</option>
+            <option>REFRIGERANTE</option>
+            <option>DESTILADO</option>
+            <option>VINHO</option>
+            <option>AGUA</option>
+            <option>ENERGETICO</option>
+            <option>OUTRO</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Validade</label>
+          <input type="date" id="fValidade">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Fornecedor</label>
+        <select id="fFornecedor">
+          <option value="">Selecione...</option>
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
+        <button class="btn btn-primary" id="btnSalvar" onclick="salvar()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm -->
+  <div class="modal-backdrop hidden" id="confirmBackdrop">
+    <div class="confirm-dialog">
+      <h3>Excluir produto</h3>
+      <p>Tem certeza que deseja excluir este produto?</p>
+      <div class="confirm-dialog-footer">
+        <button class="btn btn-secondary" onclick="fecharConfirm()">Cancelar</button>
+        <button class="btn btn-danger" id="btnConfirmDelete" onclick="confirmarDelete()">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let produtos = [];
+    let fornecedores = [];
+    let editandoId = null;
+    let deletandoId = null;
+
+    const categoriaBadge = {
+      CERVEJA: 'badge-yellow', REFRIGERANTE: 'badge-blue', DESTILADO: 'badge-red',
+      VINHO: 'badge-red', AGUA: 'badge-blue', ENERGETICO: 'badge-green', OUTRO: 'badge-gray',
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!authGuard()) return;
+      document.getElementById('sidebar-placeholder').innerHTML = sidebarHTML('produtos.html');
+      document.getElementById('topbar-placeholder').innerHTML = topbarHTML();
+      initTopbar();
+      await Promise.all([carregar(), carregarFornecedores()]);
+    });
+
+    function filtrarTabela(q) {
+      const rows = document.querySelectorAll('#tbodyProdutos tr');
+      q = q.toLowerCase();
+      rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+    }
+
+    async function carregarFornecedores() {
+      try {
+        fornecedores = await api('/fornecedores');
+        const sel = document.getElementById('fFornecedor');
+        fornecedores.forEach(f => {
+          const opt = document.createElement('option');
+          opt.value = f.id_fornecedor;
+          opt.textContent = f.nome;
+          sel.appendChild(opt);
+        });
+      } catch (e) { /* silencioso */ }
+    }
+
+    async function carregar() {
+      try {
+        produtos = await api('/produtos');
+        renderTabela(produtos);
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    function nomeFornecedor(id) {
+      const f = fornecedores.find(x => x.id_fornecedor === id);
+      return f ? f.nome : '-';
+    }
+
+    function renderTabela(lista) {
+      const tbody = document.getElementById('tbodyProdutos');
+      if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:#94a3b8">Nenhum produto cadastrado</td></tr>';
+        return;
+      }
+      tbody.innerHTML = lista.map(p => {
+        const estoqueBadge = p.estoque === 0 ? 'badge-red' : p.estoque <= 5 ? 'badge-yellow' : 'badge-green';
+        return `
+        <tr>
+          <td>${p.id_produto}</td>
+          <td>${escHtml(p.nome)}</td>
+          <td><span class="badge ${categoriaBadge[p.categoria] || 'badge-gray'}">${p.categoria || '-'}</span></td>
+          <td>${formatMoney(p.preco)}</td>
+          <td><span class="badge ${estoqueBadge}">${p.estoque}</span></td>
+          <td>${formatDate(p.validade)}</td>
+          <td>${escHtml(p.nome_fornecedor || nomeFornecedor(p.id_fornecedor))}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-icon btn-icon-edit" onclick="abrirModalEditar(${p.id_produto})" title="Editar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="btn-icon btn-icon-delete" onclick="abrirConfirmDelete(${p.id_produto})" title="Excluir">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function abrirModalNovo() {
+      editandoId = null;
+      document.getElementById('modalTitle').textContent = 'Novo Produto';
+      document.getElementById('fNome').value = '';
+      document.getElementById('fPreco').value = '';
+      document.getElementById('fEstoque').value = '';
+      document.getElementById('fCategoria').value = '';
+      document.getElementById('fValidade').value = '';
+      document.getElementById('fFornecedor').value = '';
+      document.getElementById('modalBackdrop').classList.remove('hidden');
+    }
+
+    function abrirModalEditar(id) {
+      const p = produtos.find(x => x.id_produto === id);
+      if (!p) return;
+      editandoId = id;
+      document.getElementById('modalTitle').textContent = 'Editar Produto';
+      document.getElementById('fNome').value = p.nome || '';
+      document.getElementById('fPreco').value = p.preco || '';
+      document.getElementById('fEstoque').value = p.estoque ?? '';
+      document.getElementById('fCategoria').value = p.categoria || '';
+      document.getElementById('fValidade').value = p.validade ? p.validade.split('T')[0] : '';
+      document.getElementById('fFornecedor').value = p.id_fornecedor || '';
+      document.getElementById('modalBackdrop').classList.remove('hidden');
+    }
+
+    function fecharModal() { document.getElementById('modalBackdrop').classList.add('hidden'); }
+
+    async function salvar() {
+      const nome = document.getElementById('fNome').value.trim();
+      const preco = parseFloat(document.getElementById('fPreco').value);
+      const estoque = parseInt(document.getElementById('fEstoque').value);
+      const categoria = document.getElementById('fCategoria').value;
+      const validade = document.getElementById('fValidade').value;
+      const id_fornecedor = parseInt(document.getElementById('fFornecedor').value);
+
+      if (!nome || isNaN(preco) || isNaN(estoque) || !categoria || !validade || isNaN(id_fornecedor)) {
+        toast('Preencha todos os campos', 'error'); return;
+      }
+
+      const btn = document.getElementById('btnSalvar');
+      btn.disabled = true;
+      try {
+        const body = { nome, preco, estoque, categoria, validade, id_fornecedor };
+        if (editandoId) {
+          await api(`/produtos/${editandoId}`, { method: 'PUT', body: JSON.stringify(body) });
+          toast('Produto atualizado');
+        } else {
+          await api('/produtos', { method: 'POST', body: JSON.stringify(body) });
+          toast('Produto cadastrado');
+        }
+        fecharModal();
+        await carregar();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function abrirConfirmDelete(id) { deletandoId = id; document.getElementById('confirmBackdrop').classList.remove('hidden'); }
+    function fecharConfirm() { document.getElementById('confirmBackdrop').classList.add('hidden'); }
+
+    async function confirmarDelete() {
+      const btn = document.getElementById('btnConfirmDelete');
+      btn.disabled = true;
+      try {
+        await api(`/produtos/${deletandoId}`, { method: 'DELETE' });
+        toast('Produto excluido');
+        fecharConfirm();
+        await carregar();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

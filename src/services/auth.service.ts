@@ -43,4 +43,15 @@ export const authService = {
       papel: usuario.papel,
     };
   },
+
+  async alterarSenha(id_usuario: number, senha_atual: string, nova_senha: string) {
+    const usuario = await usuarioRepository.findById(id_usuario);
+    if (!usuario) throw new AppError("Usuario nao encontrado", 404);
+
+    const senhaCorreta = await bcrypt.compare(senha_atual, usuario.senha_hash);
+    if (!senhaCorreta) throw new AppError("Senha atual incorreta", 401);
+
+    const nova_hash = await bcrypt.hash(nova_senha, env.BCRYPT_SALT_ROUNDS);
+    await usuarioRepository.updateSenha(id_usuario, nova_hash);
+  },
 };

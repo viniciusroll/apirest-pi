@@ -3,6 +3,15 @@ import * as service from "../services/pedido.service";
 import { criarPedidoSchema, atualizarPedidoSchema } from "../schemas/pedido.schema";
 import { RequestAutenticado } from "../types";
 
+export async function listar(_req: Request, res: Response, next: NextFunction) {
+  try {
+    const pedidos = await service.listar();
+    res.json(pedidos);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function listarPedidosPorCliente(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);

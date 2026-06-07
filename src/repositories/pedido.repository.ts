@@ -94,6 +94,22 @@ createPedido(
   });
 },
 
+findAll(): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    db.all(
+      `SELECT p.*, c.nome AS nome_cliente
+       FROM pedido p
+       LEFT JOIN cliente c ON c.id_cliente = p.id_cliente
+       ORDER BY p.id_pedido DESC`,
+      [],
+      (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows as any[]);
+      }
+    );
+  });
+},
+
 findByClienteId(id_cliente: number): Promise<any[]> {
   return new Promise((resolve, reject) => {
     db.all(

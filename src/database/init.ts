@@ -5,6 +5,11 @@ import path from "path";
 const dbPath = path.resolve(__dirname, "../../database.db");
 const schemaPath = path.resolve(__dirname, "schema.sql");
 
+// Remove o banco antigo para garantir schema limpo
+if (fs.existsSync(dbPath)) {
+  fs.unlinkSync(dbPath);
+}
+
 const schema = fs.readFileSync(schemaPath, "utf-8");
 const db = new sqlite3.Database(dbPath);
 

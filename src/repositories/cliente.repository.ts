@@ -20,13 +20,23 @@ import {
 
 export const clienteRepository = {
   // --------------------------------------------------------------------------
-  // Lista TODOS os clientes
+  // Lista TODOS os clientes com emails e telefones
   // --------------------------------------------------------------------------
-  findAll(): Promise<Cliente[]> {
+  findAll(): Promise<ClienteCompleto[]> {
     return new Promise((resolve, reject) => {
-      db.all("SELECT * FROM cliente ORDER BY id_cliente", (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows as Cliente[]);
+      db.all("SELECT * FROM cliente ORDER BY id_cliente", (err, clientes: Cliente[]) => {
+        if (err) return reject(err);
+        db.all("SELECT id_cliente, email FROM email_cliente ORDER BY id", (errE, emails: { id_cliente: number; email: string }[]) => {
+          if (errE) return reject(errE);
+          db.all("SELECT id_cliente, telefone FROM telefone_cliente ORDER BY id", (errT, telefones: { id_cliente: number; telefone: string }[]) => {
+            if (errT) return reject(errT);
+            const emailsPorId = new Map<number, string[]>();
+            for (const e of emails) { const l = emailsPorId.get(e.id_cliente) ?? []; l.push(e.email); emailsPorId.set(e.id_cliente, l); }
+            const telsPorId = new Map<number, string[]>();
+            for (const t of telefones) { const l = telsPorId.get(t.id_cliente) ?? []; l.push(t.telefone); telsPorId.set(t.id_cliente, l); }
+            resolve(clientes.map(c => ({ ...c, emails: emailsPorId.get(c.id_cliente) ?? [], telefones: telsPorId.get(c.id_cliente) ?? [] })));
+          });
+        });
       });
     });
   },

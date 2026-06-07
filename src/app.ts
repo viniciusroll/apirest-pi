@@ -7,10 +7,14 @@
 // ============================================================================
 
 import express from "express";
+import path from "path";
 import routes from "./routes";
 import { errorHandler } from "./middleware/error.middleware";
 
 const app = express();
+
+// Serve arquivos estáticos da pasta frontend/
+app.use(express.static(path.resolve(__dirname, "../frontend")));
 
 // Habilita parse de JSON no body das requests
 app.use(express.json());

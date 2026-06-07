@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedidos — Sistema de Gestao</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .items-section { border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 14px; }
+    .items-section-title { font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .item-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .item-row select { flex: 2; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 7px; font-size: 13px; font-family: 'Poppins', sans-serif; }
+    .item-row input { flex: 1; min-width: 60px; }
+  </style>
+</head>
+<body>
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main">
+    <div id="topbar-placeholder"></div>
+
+    <div class="page-content">
+      <div class="page-header">
+        <h1 class="page-title">Pedidos</h1>
+        <button class="btn btn-primary" onclick="abrirModalNovo()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Pedido
+        </button>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Pagamento</th>
+              <th>Status</th>
+              <th>Total</th>
+              <th>Data</th>
+              <th>Acoes</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyPedidos">
+            <tr class="loading-row"><td colspan="7">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal criar -->
+  <div class="modal-backdrop hidden" id="modalCriarBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Novo Pedido</span>
+        <button class="modal-close" onclick="fecharModalCriar()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label>Cliente</label>
+        <select id="fCliente"><option value="">Selecione o cliente...</option></select>
+      </div>
+      <div class="form-group">
+        <label>Forma de Pagamento</label>
+        <select id="fPagamento">
+          <option value="">Selecione...</option>
+          <option>DINHEIRO</option>
+          <option>CARTAO</option>
+          <option>PIX</option>
+          <option>FIADO</option>
+        </select>
+      </div>
+
+      <div class="items-section">
+        <div class="items-section-title">Itens do Pedido</div>
+        <div id="itensList"></div>
+        <button type="button" class="btn-add-row" onclick="addItemRow()">+ Adicionar item</button>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModalCriar()">Cancelar</button>
+        <button class="btn btn-primary" id="btnCriar" onclick="criarPedido()">Criar Pedido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal editar status -->
+  <div class="modal-backdrop hidden" id="modalEditarBackdrop">
+    <div class="modal" style="max-width:380px">
+      <div class="modal-header">
+        <span class="modal-title">Atualizar Pedido #<span id="editandoIdLabel"></span></span>
+        <button class="modal-close" onclick="fecharModalEditar()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="fStatus">
+          <option>PENDENTE</option>
+          <option>PAGO</option>
+          <option>CANCELADO</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Forma de Pagamento</label>
+        <select id="fPagamentoEdit">
+          <option>DINHEIRO</option>
+          <option>CARTAO</option>
+          <option>PIX</option>
+          <option>FIADO</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="fecharModalEditar()">Cancelar</button>
+        <button class="btn btn-primary" id="btnEditar" onclick="salvarEdicao()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm delete -->
+  <div class="modal-backdrop hidden" id="confirmBackdrop">
+    <div class="confirm-dialog">
+      <h3>Cancelar / Excluir pedido</h3>
+      <p>Tem certeza? Apenas pedidos nao pagos podem ser excluidos.</p>
+      <div class="confirm-dialog-footer">
+        <button class="btn btn-secondary" onclick="fecharConfirm()">Cancelar</button>
+        <button class="btn btn-danger" id="btnConfirmDelete" onclick="confirmarDelete()">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let pedidos = [];
+    let clientes = [];
+    let produtos = [];
+    let editandoId = null;
+    let deletandoId = null;
+
+    const statusBadge = { PENDENTE: 'badge-yellow', PAGO: 'badge-green', CANCELADO: 'badge-red' };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!authGuard()) return;
+      document.getElementById('sidebar-placeholder').innerHTML = sidebarHTML('pedidos.html');
+      document.getElementById('topbar-placeholder').innerHTML = topbarHTML();
+      initTopbar();
+      await Promise.all([carregar(), carregarClientes(), carregarProdutos()]);
+    });
+
+    function filtrarTabela(q) {
+      document.querySelectorAll('#tbodyPedidos tr').forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+      });
+    }
+
+    async function carregar() {
+      try {
+        pedidos = await api('/pedidos');
+        renderTabela(pedidos);
+      } catch (e) { toast(e.message, 'error'); }
+    }
+
+    async function carregarClientes() {
+      try {
+        clientes = await api('/clientes');
+        const sel = document.getElementById('fCliente');
+        clientes.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id_cliente;
+          opt.textContent = c.nome;
+          sel.appendChild(opt);
+        });
+      } catch (e) { /* silencioso */ }
+    }
+
+    async function carregarProdutos() {
+      try { produtos = await api('/produtos'); } catch (e) { /* silencioso */ }
+    }
+
+    function nomeCliente(id) {
+      const c = clientes.find(x => x.id_cliente === id);
+      return c ? c.nome : ('#' + id);
+    }
+
+    function renderTabela(lista) {
+      const tbody = document.getElementById('tbodyPedidos');
+      if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#94a3b8">Nenhum pedido registrado</td></tr>';
+        return;
+      }
+      tbody.innerHTML = lista.map(p => `
+        <tr>
+          <td>#${p.id_pedido}</td>
+          <td>${escHtml(p.nome_cliente || nomeCliente(p.id_cliente))}</td>
+          <td>${escHtml(p.forma_pagamento)}</td>
+          <td><span class="badge ${statusBadge[p.status] || 'badge-gray'}">${p.status}</span></td>
+          <td>${formatMoney(p.total_pedido)}</td>
+          <td>${formatDate(p.criado_em)}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn-icon btn-icon-edit" onclick="abrirModalEditar(${p.id_pedido})" title="Editar">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="btn-icon btn-icon-delete" onclick="abrirConfirmDelete(${p.id_pedido})" title="Excluir">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function abrirModalNovo() {
+      document.getElementById('itensList').innerHTML = '';
+      document.getElementById('fCliente').value = '';
+      document.getElementById('fPagamento').value = '';
+      addItemRow();
+      document.getElementById('modalCriarBackdrop').classList.remove('hidden');
+    }
+    function fecharModalCriar() { document.getElementById('modalCriarBackdrop').classList.add('hidden'); }
+
+    function addItemRow() {
+      const list = document.getElementById('itensList');
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      const opts = produtos.map(p => `<option value="${p.id_produto}">${escHtml(p.nome)} — ${formatMoney(p.preco)}</option>`).join('');
+      row.innerHTML = `
+        <select><option value="">Selecione o produto...</option>${opts}</select>
+        <input type="number" placeholder="Qtd" min="1" step="1" value="1" style="width:80px">
+        <button type="button" class="btn-icon btn-icon-delete" onclick="this.parentElement.remove()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>`;
+      list.appendChild(row);
+    }
+
+    async function criarPedido() {
+      const id_cliente = parseInt(document.getElementById('fCliente').value);
+      const forma_pagamento = document.getElementById('fPagamento').value;
+
+      const itemRows = document.querySelectorAll('#itensList .item-row');
+      const itens = [];
+      for (const row of itemRows) {
+        const sel = row.querySelector('select');
+        const qty = row.querySelector('input');
+        const id_produto = parseInt(sel.value);
+        const quantidade = parseInt(qty.value);
+        if (!id_produto || isNaN(quantidade) || quantidade < 1) continue;
+        itens.push({ id_produto, quantidade });
+      }
+
+      if (isNaN(id_cliente) || !forma_pagamento || !itens.length) {
+        toast('Preencha cliente, pagamento e ao menos um item valido', 'error'); return;
+      }
+
+      const btn = document.getElementById('btnCriar');
+      btn.disabled = true;
+      try {
+        await api('/pedidos', { method: 'POST', body: JSON.stringify({ id_cliente, forma_pagamento, itens }) });
+        toast('Pedido criado com sucesso');
+        fecharModalCriar();
+        await carregar();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function abrirModalEditar(id) {
+      const p = pedidos.find(x => x.id_pedido === id);
+      if (!p) return;
+      editandoId = id;
+      document.getElementById('editandoIdLabel').textContent = id;
+      document.getElementById('fStatus').value = p.status;
+      document.getElementById('fPagamentoEdit').value = p.forma_pagamento;
+      document.getElementById('modalEditarBackdrop').classList.remove('hidden');
+    }
+    function fecharModalEditar() { document.getElementById('modalEditarBackdrop').classList.add('hidden'); }
+
+    async function salvarEdicao() {
+      const status = document.getElementById('fStatus').value;
+      const forma_pagamento = document.getElementById('fPagamentoEdit').value;
+      const btn = document.getElementById('btnEditar');
+      btn.disabled = true;
+      try {
+        await api(`/pedidos/${editandoId}`, { method: 'PUT', body: JSON.stringify({ status, forma_pagamento }) });
+        toast('Pedido atualizado');
+        fecharModalEditar();
+        await carregar();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function abrirConfirmDelete(id) { deletandoId = id; document.getElementById('confirmBackdrop').classList.remove('hidden'); }
+    function fecharConfirm() { document.getElementById('confirmBackdrop').classList.add('hidden'); }
+
+    async function confirmarDelete() {
+      const btn = document.getElementById('btnConfirmDelete');
+      btn.disabled = true;
+      try {
+        await api(`/pedidos/${deletandoId}`, { method: 'DELETE' });
+        toast('Pedido excluido');
+        fecharConfirm();
+        await carregar();
+      } catch (e) {
+        toast(e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

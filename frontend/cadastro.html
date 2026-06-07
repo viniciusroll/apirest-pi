@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loja de Bebidas — Entrar</title>
+    <title>Loja de Bebidas — Cadastro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -36,24 +36,12 @@
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
         }
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .header svg {
-            width: 32px;
-            height: 32px;
-            color: #2563EB;
-        }
-
         .header h1 {
             font-size: 22px;
             font-weight: 600;
             color: #1e293b;
+            text-align: center;
+            margin-bottom: 8px;
         }
 
         .subtitle {
@@ -136,40 +124,7 @@
             height: 18px;
         }
 
-        .options-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            font-size: 13px;
-        }
-
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            color: #475569;
-        }
-
-        .checkbox-wrapper input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: #2563EB;
-            cursor: pointer;
-        }
-
-        .forgot-link {
-            color: #2563EB;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .forgot-link:hover {
-            text-decoration: underline;
-        }
-
-        .btn-entrar {
+        .btn-cadastrar {
             width: 100%;
             padding: 12px;
             background-color: #2563EB;
@@ -180,13 +135,14 @@
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.15s;
+            margin-top: 4px;
         }
 
-        .btn-entrar:hover:not(:disabled) {
+        .btn-cadastrar:hover:not(:disabled) {
             background-color: #1d4ed8;
         }
 
-        .btn-entrar:disabled {
+        .btn-cadastrar:disabled {
             opacity: 0.7;
             cursor: not-allowed;
         }
@@ -214,21 +170,27 @@
             border: 1px solid #bbf7d0;
         }
 
-        .signup-link {
+        .login-link {
             text-align: center;
             margin-top: 20px;
             font-size: 14px;
             color: #475569;
         }
 
-        .signup-link a {
+        .login-link a {
             color: #2563EB;
             text-decoration: none;
             font-weight: 500;
         }
 
-        .signup-link a:hover {
+        .login-link a:hover {
             text-decoration: underline;
+        }
+
+        .password-hint {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -239,9 +201,19 @@
                 <h1>Sistema de Gestão</h1>
             </div>
 
-            <p class="subtitle">Entrar</p>
+            <p class="subtitle">Criar conta</p>
 
-            <form id="loginForm" novalidate>
+            <form id="cadastroForm" novalidate>
+                <div class="form-group">
+                    <label for="nome">Nome completo</label>
+                    <div class="input-wrapper">
+                        <svg class="icon-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <input type="text" id="nome" name="nome" placeholder="Seu nome" required autocomplete="name">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="email">Email</label>
                     <div class="input-wrapper">
@@ -260,9 +232,27 @@
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
-                        <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required autocomplete="current-password">
-                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar senha">
-                            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <input type="password" id="senha" name="senha" placeholder="Mínimo 6 caracteres" required autocomplete="new-password">
+                        <button type="button" class="toggle-password" id="toggleSenha" aria-label="Mostrar senha">
+                            <svg id="eyeSenha" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="password-hint">Use pelo menos 6 caracteres</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmarSenha">Confirmar senha</label>
+                    <div class="input-wrapper has-toggle">
+                        <svg class="icon-left" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="confirmarSenha" name="confirmarSenha" placeholder="Repita a senha" required autocomplete="new-password">
+                        <button type="button" class="toggle-password" id="toggleConfirmar" aria-label="Mostrar senha">
+                            <svg id="eyeConfirmar" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
@@ -270,36 +260,23 @@
                     </div>
                 </div>
 
-                <div class="options-row">
-                    <label class="checkbox-wrapper">
-                        <input type="checkbox" id="lembrar">
-                        <span>Lembrar meu acesso</span>
-                    </label>
-                    <a href="#" class="forgot-link">Esqueci minha senha</a>
-                </div>
-
-                <button type="submit" class="btn-entrar" id="btnEntrar">Entrar</button>
+                <button type="submit" class="btn-cadastrar" id="btnCadastrar">Criar conta</button>
 
                 <div class="message" id="message"></div>
             </form>
         </div>
 
-        <p class="signup-link">
-            Não tem conta? <a href="cadastro.html">Cadastre-se</a>
+        <p class="login-link">
+            Já tem conta? <a href="login.html">Entrar</a>
         </p>
     </div>
 
     <script>
         const API_URL = 'http://localhost:3000';
 
-        const form = document.getElementById('loginForm');
-        const emailInput = document.getElementById('email');
-        const senhaInput = document.getElementById('senha');
-        const lembrarCheckbox = document.getElementById('lembrar');
-        const btnEntrar = document.getElementById('btnEntrar');
+        const form = document.getElementById('cadastroForm');
+        const btnCadastrar = document.getElementById('btnCadastrar');
         const message = document.getElementById('message');
-        const togglePassword = document.getElementById('togglePassword');
-        const eyeIcon = document.getElementById('eyeIcon');
 
         const eyeOpenSVG = `
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -310,22 +287,18 @@
             <line x1="1" y1="1" x2="23" y2="23"></line>
         `;
 
-        // Preenche email salvo se "Lembrar meu acesso" foi marcado anteriormente
-        window.addEventListener('DOMContentLoaded', () => {
-            const emailSalvo = localStorage.getItem('email_lembrado');
-            if (emailSalvo) {
-                emailInput.value = emailSalvo;
-                lembrarCheckbox.checked = true;
-            }
-        });
+        function setupToggle(btnId, inputId, iconId) {
+            document.getElementById(btnId).addEventListener('click', () => {
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                icon.innerHTML = isPassword ? eyeClosedSVG : eyeOpenSVG;
+            });
+        }
 
-        // Toggle mostrar/ocultar senha
-        togglePassword.addEventListener('click', () => {
-            const isPassword = senhaInput.type === 'password';
-            senhaInput.type = isPassword ? 'text' : 'password';
-            eyeIcon.innerHTML = isPassword ? eyeClosedSVG : eyeOpenSVG;
-            togglePassword.setAttribute('aria-label', isPassword ? 'Ocultar senha' : 'Mostrar senha');
-        });
+        setupToggle('toggleSenha', 'senha', 'eyeSenha');
+        setupToggle('toggleConfirmar', 'confirmarSenha', 'eyeConfirmar');
 
         function mostrarMensagem(texto, tipo) {
             message.textContent = texto;
@@ -341,58 +314,54 @@
             e.preventDefault();
             limparMensagem();
 
-            const email = emailInput.value.trim();
-            const senha = senhaInput.value;
+            const nome = document.getElementById('nome').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+            const confirmarSenha = document.getElementById('confirmarSenha').value;
 
-            if (!email || !senha) {
-                mostrarMensagem('Preencha email e senha.', 'error');
+            if (!nome || !email || !senha || !confirmarSenha) {
+                mostrarMensagem('Preencha todos os campos.', 'error');
                 return;
             }
 
-            btnEntrar.disabled = true;
-            btnEntrar.textContent = 'Entrando...';
+            if (senha.length < 6) {
+                mostrarMensagem('A senha deve ter pelo menos 6 caracteres.', 'error');
+                return;
+            }
+
+            if (senha !== confirmarSenha) {
+                mostrarMensagem('As senhas não coincidem.', 'error');
+                return;
+            }
+
+            btnCadastrar.disabled = true;
+            btnCadastrar.textContent = 'Criando conta...';
 
             try {
-                const response = await fetch(`${API_URL}/auth/login`, {
+                const response = await fetch(`${API_URL}/auth/registrar`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, senha })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, email, senha })
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    const erro = data.erro || 'Email ou senha inválidos.';
+                    const erro = data.erro || data.message || 'Erro ao criar conta.';
                     mostrarMensagem(erro, 'error');
                     return;
                 }
 
-                if (!data.token) {
-                    mostrarMensagem('Resposta inválida do servidor.', 'error');
-                    return;
-                }
-
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('usuario', JSON.stringify(data.usuario));
-
-                if (lembrarCheckbox.checked) {
-                    localStorage.setItem('email_lembrado', email);
-                } else {
-                    localStorage.removeItem('email_lembrado');
-                }
-
-                mostrarMensagem('Login realizado! Redirecionando...', 'success');
+                mostrarMensagem('Conta criada com sucesso! Redirecionando...', 'success');
 
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 600);
+                    window.location.href = 'login.html';
+                }, 1200);
             } catch (err) {
-                mostrarMensagem('Não foi possível conectar à API', 'error');
+                mostrarMensagem('Não foi possível conectar à API.', 'error');
             } finally {
-                btnEntrar.disabled = false;
-                btnEntrar.textContent = 'Entrar';
+                btnCadastrar.disabled = false;
+                btnCadastrar.textContent = 'Criar conta';
             }
         });
     </script>

@@ -7,6 +7,7 @@ const router = Router();
 
 router.use(authMiddleware);
 
+router.get("/", controller.listar);
 router.post("/", authMiddleware, controller.criarPedido);
 router.get("/:id", controller.buscarPedidoPorId);
 router.put("/:id", controller.atualizarPedido);

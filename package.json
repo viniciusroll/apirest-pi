@@ -4,6 +4,7 @@
   "description": "API REST para sistema de pedidos de loja de bebidas",
   "main": "dist/server.js",
   "scripts": {
+    "start:all": "powershell -ExecutionPolicy Bypass -File ./start.ps1",
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
