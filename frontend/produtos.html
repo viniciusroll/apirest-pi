@@ -133,9 +133,29 @@
     });
 
     function filtrarTabela(q) {
+      const cleaned = q.trim();
       const rows = document.querySelectorAll('#tbodyProdutos tr');
-      q = q.toLowerCase();
-      rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+      if (!cleaned) {
+        rows.forEach(r => { r.style.display = ''; });
+        return;
+      }
+
+      const numericOnly = /^[0-9]+$/.test(cleaned);
+      rows.forEach(r => {
+        const id = r.cells[0]?.textContent?.trim() || '';
+        const nome = r.cells[1]?.textContent?.toLowerCase() || '';
+        const categoria = r.cells[2]?.textContent?.toLowerCase() || '';
+        const preco = r.cells[3]?.textContent?.toLowerCase() || '';
+        const estoque = r.cells[4]?.textContent?.toLowerCase() || '';
+        const validade = r.cells[5]?.textContent?.toLowerCase() || '';
+        const fornecedor = r.cells[6]?.textContent?.toLowerCase() || '';
+
+        const visible = numericOnly
+          ? id === cleaned
+          : [nome, categoria, preco, estoque, validade, fornecedor].some(field => field.includes(cleaned.toLowerCase()));
+
+        r.style.display = visible ? '' : 'none';
+      });
     }
 
     async function carregarFornecedores() {

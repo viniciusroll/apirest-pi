@@ -212,7 +212,7 @@
       }
       tbody.innerHTML = lista.map(p => `
         <tr>
-          <td>#${p.id_pedido}</td>
+          <td>${p.id_pedido}</td>
           <td>${escHtml(p.nome_cliente || nomeCliente(p.id_cliente))}</td>
           <td>${escHtml(p.forma_pagamento)}</td>
           <td><span class="badge ${statusBadge[p.status] || 'badge-gray'}">${p.status}</span></td>

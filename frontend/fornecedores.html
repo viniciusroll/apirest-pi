@@ -118,8 +118,28 @@
     });
 
     function filtrarTabela(q) {
-      document.querySelectorAll('#tbodyFornecedores tr').forEach(r => {
-        r.style.display = r.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+      const cleaned = q.trim();
+      const rows = document.querySelectorAll('#tbodyFornecedores tr');
+      if (!cleaned) {
+        rows.forEach(r => { r.style.display = ''; });
+        return;
+      }
+
+      const numericOnly = /^[0-9]+$/.test(cleaned);
+      rows.forEach(r => {
+        const id = r.cells[0]?.textContent?.trim() || '';
+        const nome = r.cells[1]?.textContent?.toLowerCase() || '';
+        const cnpj = r.cells[2]?.textContent?.toLowerCase() || '';
+        const endereco = r.cells[3]?.textContent?.toLowerCase() || '';
+        const prazo = r.cells[4]?.textContent?.toLowerCase() || '';
+        const emails = r.cells[5]?.textContent?.toLowerCase() || '';
+        const telefones = r.cells[6]?.textContent?.toLowerCase() || '';
+
+        const visible = numericOnly
+          ? id === cleaned
+          : [nome, cnpj, endereco, prazo, emails, telefones].some(field => field.includes(cleaned.toLowerCase()));
+
+        r.style.display = visible ? '' : 'none';
       });
     }
 
