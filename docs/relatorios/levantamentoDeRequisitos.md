@@ -13,7 +13,6 @@
 3. [Levantamento de Requisitos](#3-levantamento-de-requisitos)
 4. [Análise de Riscos](#4-análise-de-riscos)
 5. [Considerações Finais](#5-considerações-finais)
-6. [Referências](#6-referências)
 
 ---
 
@@ -277,8 +276,3 @@ A análise de riscos revelou que o principal desafio do projeto não é de natur
 Os requisitos especificados neste documento orientarão a próxima fase do Modelo Cascata: o **Projeto**, na qual serão definidas a arquitetura da solução, a modelagem de dados, a escolha definitiva das tecnologias e o cálculo da estimativa de esforço por meio de Pontos de Função.
 
 ---
-
-
-BRASIL. **Lei n.º 13.709, de 14 de agosto de 2018** – Lei Geral de Proteção de Dados Pessoais (LGPD). Brasília: Presidência da República, 2018.
-
-ISO/IEC/IEEE 29148. **Systems and software engineering — Life cycle processes — Requirements engineering**. Genebra: ISO, 2018.
