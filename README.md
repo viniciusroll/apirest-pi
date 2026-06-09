@@ -154,6 +154,7 @@ Detalhes em [docs/relatorios/entrevista01.md](docs/relatorios/entrevista01.md).
 
 ## Endpoints da API
 
+Base URL (produção): `https://apirest-pi.onrender.com`
 Base URL: `http://localhost:3000`
 
 ### Autenticação (`/auth`) — público
@@ -222,6 +223,7 @@ Base URL: `http://localhost:3000`
 
 ## Documentação
 
+- [Swagger UI (live)](https://apirest-pi.onrender.com/docs)
 - [Relatório de requisitos](docs/relatorios/entrevista01.md)
 - [DER (PNG)](docs/diagramas/der.png)
 
