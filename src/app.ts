@@ -10,6 +10,7 @@ import express from "express";
 import path from "path";
 import routes from "./routes";
 import { errorHandler } from "./middleware/error.middleware";
+import { setupSwagger } from "./config/swagger";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.static(path.resolve(__dirname, "../frontend")));
 
 // Habilita parse de JSON no body das requests
 app.use(express.json());
+setupSwagger(app);
 
 // Habilita CORS para qualquer origem (desenvolvimento)
 app.use((req, res, next) => {
